@@ -1,5 +1,6 @@
-var SimpleStorage = artifacts.require("./SimpleStorage.sol");
+var NotesMarketContract = artifacts.require('./NotesMarketContract.sol');
+const commission = 10;
 
-module.exports = function(deployer) {
-  deployer.deploy(SimpleStorage);
+module.exports = function (deployer) {
+  deployer.deploy(NotesMarketContract, commission);
 };

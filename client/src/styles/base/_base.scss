@@ -1,0 +1,150 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+    Helvetica Neue, Ubuntu, sans-serif;
+}
+
+html,
+body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  color: $c-blue-primary;
+  background-color: #f4f7f6;
+  font-weight: 400;
+  font-size: 14px;
+  font-family: 'Noto-regular', sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+span,
+ul {
+  margin-bottom: 0;
+}
+
+a {
+  color: $c-blue-primary;
+  text-decoration: none;
+  &:hover,
+  &:focus {
+    color: darken($color: $c-blue-primary, $amount: 20);
+    text-decoration: none;
+  }
+}
+ul {
+  padding: 0;
+}
+li {
+  list-style: none;
+}
+.list-style-circle li {
+  list-style: circle;
+}
+p {
+  margin-bottom: 0;
+}
+input,
+select {
+  border: 1px solid $bo-blue-d9;
+  box-shadow: none;
+  border-radius: 5px;
+  padding: 4px 8px;
+  &:hover,
+  &:focus {
+    outline: none;
+    border: 1px solid darken($color: $bo-blue-d9, $amount: 20);
+  }
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &.space-between {
+    justify-content: space-between;
+  }
+  &.start {
+    justify-content: flex-start;
+  }
+  &.end {
+    justify-content: flex-end;
+  }
+  &.align-start {
+    align-items: flex-start;
+  }
+  &.column {
+    flex-direction: column;
+  }
+  .flex50 {
+    flex: 1 1 50%;
+  }
+  .flex-auto {
+    flex: 1 1 auto;
+  }
+}
+.flex1 {
+  flex: 1;
+}
+.pointer {
+  cursor: pointer;
+}
+.dropdown-item {
+  color: $c-blue-active;
+  font-size: 14px;
+}
+.card {
+  background: #fff;
+  cursor: pointer;
+  border-color: #e3e8ee;
+  &:hover {
+    background-color: $bg-blue-light;
+  }
+  button {
+    color: $btn-blue-active;
+    font-size: 14px;
+    text-decoration: none !important;
+    text-align: left;
+    &.btn-link {
+      &:hover {
+        color: $btn-blue-active;
+        text-decoration: none;
+      }
+      &:focus {
+        box-shadow: none;
+      }
+    }
+    span {
+      margin-right: 12px;
+    }
+  }
+}
+.card.active {
+  background-color: $bg-blue-light;
+  .card-header {
+    background-color: $bg-blue-light;
+  }
+}
+.react-datepicker-popper {
+  z-index: 2;
+}
+.opacity0 {
+  opacity: 0;
+}
+.opacity1 {
+  opacity: 1;
+}
+.hidden {
+  display: none;
+}
+.show {
+  display: block;
+}
+.uppercase {
+  text-transform: uppercase;
+}

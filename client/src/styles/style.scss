@@ -1,0 +1,25 @@
+@import '~bootstrap/scss/bootstrap';
+@import './base/settings';
+@import './base/base';
+
+@import './components/home';
+@import './components/login';
+
+@font-face {
+  font-family: 'Noto-bold';
+  src: local('Noto-bold'), url('./fonts/NotoSans-Bold.ttf') format('truetype');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'Noto-italic';
+  src: local('Noto-bold'), url('./fonts/NotoSans-Italic.ttf') format('truetype');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'Noto-regular';
+  src: local('Noto-bold'),
+    url('./fonts/NotoSans-Regular.ttf') format('truetype');
+  font-weight: normal;
+}
