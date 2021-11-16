@@ -4,6 +4,7 @@ import { PublicRoute } from './PublicRoute';
 import Home from '../pages/Home';
 import { Note } from '../pages/Note';
 import { LoginScreen } from '../pages/LoginScreen';
+import { NewNoteScreen } from '../pages/Note/NewNoteScreen';
 
 export const AppRouter = () => {
   return (
@@ -14,6 +15,7 @@ export const AppRouter = () => {
             <PublicRoute exact path="/login" component={LoginScreen} />
             <PublicRoute exact path="/" component={Home} />
             <PublicRoute exact path="/note/:id" component={Note} />
+            <PublicRoute exact path="/note_new" component={NewNoteScreen} />
 
             {/* <Redirect to={'/'} /> */}
           </Switch>

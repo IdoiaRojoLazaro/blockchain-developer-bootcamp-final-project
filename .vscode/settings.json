@@ -1,5 +1,18 @@
+// {
+//     "solidity.compileUsingRemoteVersion": "v0.6.0+commit.26b70077",
+//     "solidity.defaultCompiler": "localNodeModule",
+//     "solidity.compileUsingLocalVersion": "/Users/idoia/Documents/blockchain/blockchain-developer-bootcamp-final-project/soljson-v0.8.0+commit.c7dfd78e.js",
+//     "editor.formatOnSave": true,
+//     "editor.defaultFormatter": "esbenp.prettier-vscode"
+// }
 {
-    "solidity.compileUsingRemoteVersion": "v0.6.0+commit.26b70077",
-    "solidity.defaultCompiler": "localNodeModule",
-    "solidity.compileUsingLocalVersion": "/Users/idoia/Documents/blockchain/blockchain-developer-bootcamp-final-project/soljson-v0.8.0+commit.c7dfd78e.js"
+    "cSpell.words": [
+        "Swal",
+        "videosessions"
+    ],
+    "files.associations": {
+        "*.js": "javascriptreact"
+    },
+    "javascript.suggest.autoImports": true,
+    "editor.wordWrap": "on"
 }

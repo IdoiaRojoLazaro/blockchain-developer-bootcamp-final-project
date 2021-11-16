@@ -3,9 +3,12 @@ import { useWeb3React } from '@web3-react/core';
 import MetamaskConnectButton from '../components/MetamaskConnectButton';
 import NotesMarketContract from '../contracts/NotesMarketContract.json';
 import getWeb3 from '../getWeb3';
+import { useHistory } from 'react-router';
 
 export const LoginScreen = () => {
   const { activate, active, account, deactivate } = useWeb3React();
+  const history = useHistory();
+
   const [state, setState] = useState({
     storageValue: 0,
     web3: null,
@@ -29,9 +32,9 @@ export const LoginScreen = () => {
 
         // instance.options.address = '0xA65990EC0CA555d2eCDD1d84E9D1397CFA967E60';
         //instance.options.address = '0xE353ae33bCB3478213369662ad275D81bdFe178A';
-        instance.options.address = process.env.contract_address;
+        instance.options.address = process.env.REACT_APP_CONTRACT_ADDR;
 
-        setState((value) => ({ ...value, web3, accounts, contract: instance }));
+        setState(value => ({ ...value, web3, accounts, contract: instance }));
       } catch (error) {
         alert(
           'Failed to load web3, accounts, or contract. Check console for details.'
@@ -48,13 +51,18 @@ export const LoginScreen = () => {
       let user = state.contract.methods
         .getUser()
         .call({ from: state.accounts[0] })
-        .then((res) => console.log(res));
+        .then(res => {
+          console.log(res);
+          if (res._authStatus) {
+            history.push('/');
+          }
+        });
       console.log('user');
       console.log(user);
     }
   }, [state]);
 
-  const addNewUser = async (noteOwner) => {
+  const addNewUser = async noteOwner => {
     let response = await state.contract.methods
       .addUser(noteOwner)
       .send({ from: account });
@@ -65,8 +73,7 @@ export const LoginScreen = () => {
     if (response.status == true && response.events.UserCreated) {
       alert('you have been successfully registered');
       localStorage.setItem('isAuthenticated', true);
-
-      window.href = '/';
+      history.push('/');
     }
   };
 
