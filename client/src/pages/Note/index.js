@@ -9,9 +9,9 @@ export const Note = () => {
 
   useEffect(() => {
     console.log(id);
-    setNote(listNotes.filter((item) => item.id == id)[0]);
+    setNote(listNotes.filter(item => item.id == id)[0]);
     console.log(listNotes);
-    console.log(listNotes.filter((item) => item.id == id)[0]);
+    console.log(listNotes.filter(item => item.id == id)[0]);
   }, [id]);
 
   return (

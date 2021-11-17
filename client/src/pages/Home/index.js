@@ -2,22 +2,26 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router';
 import IPFSGatewayTools from '@pinata/ipfs-gateway-tools/dist/browser';
 import axios from 'axios';
+import { NoteNewModal } from '../Note/NoteNewModal';
 
 // import { Container } from 'react-bootstrap';
 // import CompInteractionCard from './CompInteractionCard';
 // import ConnectWalletModal from '../../components/ConnectWalletModal';
 // import useWalletConnectionModal from '../../hooks/useWalletConnectionModal';
 
-const Home = () => {
+const Home = ({ state }) => {
+  console.log('state');
+  console.log(state);
   const history = useHistory();
 
   const [fileUploaded, setFileUploaded] = useState(null);
+  const [newNoteModal, setNewNoteModal] = useState(false);
   const gatewayTools = new IPFSGatewayTools();
   const pinataApiKey = process.env.REACT_APP_PINATA_API_KEY;
   const pinataSecretApiKey = process.env.REACT_APP_PINATA_SECRET_API_KEY;
 
   const retrieveFile = e => {
-    const data = e.target.files[0];
+    //const data = e.target.files[0];
     setFileUploaded(e.target.files[0]);
     // const reader = new window.FileReader();
     // reader.readAsArrayBuffer(data);
@@ -91,6 +95,9 @@ const Home = () => {
       })
       .then(function (response) {
         console.log(response);
+        let IpfsHash = response.data.IpfsHash;
+        console.log(IpfsHash);
+
         //handle response here
       })
       .catch(function (error) {
@@ -123,6 +130,9 @@ const Home = () => {
     //   <CompInteractionCard />
     // </Container>
     <div>
+      <button className="btn btn-primary" onClick={() => setNewNoteModal(true)}>
+        Add new note
+      </button>
       <div className="notes__container">
         {notes.map((note, i) => (
           <div
@@ -140,6 +150,14 @@ const Home = () => {
             </button>
           </form>
         </div>
+        {state && state.accounts && (
+          <NoteNewModal
+            show={newNoteModal}
+            setShow={setNewNoteModal}
+            contract={state.contract}
+            account={state.accounts[0]}
+          />
+        )}
       </div>
     </div>
   );

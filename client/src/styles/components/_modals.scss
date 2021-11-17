@@ -1,0 +1,129 @@
+.ReactModalPortal > div {
+  opacity: 0;
+}
+
+.ReactModalPortal .ReactModal__Overlay {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  transition: opacity 0.2s ease-in-out;
+  z-index: 999;
+}
+
+.modal-fondo {
+  background-color: rgba(0, 0, 0, 0.3);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  position: fixed;
+}
+
+.ReactModalPortal .ReactModal__Overlay--after-open {
+  opacity: 1;
+}
+
+.ReactModalPortal .ReactModal__Overlay--before-close {
+  opacity: 0;
+}
+.modal {
+  background: white;
+  border-radius: 5px;
+  color: rgb(51, 51, 51);
+  display: inline;
+  max-height: 620px;
+  max-width: 500px;
+  outline: none;
+  padding: 10px;
+  padding: 0 !important;
+  .container {
+    padding: 0;
+    height: 100%;
+    position: relative;
+  }
+  &.modal-height-auto {
+    height: auto;
+  }
+  .modal__body {
+    padding: 10px 20px;
+  }
+}
+.modal__header,
+.modal__footer {
+  padding: 0 20px;
+}
+.modal__header {
+  height: 56px;
+  box-shadow: inset 0 -1px #e3e8ee;
+  display: flex;
+  align-items: center;
+  h3 {
+    font-size: 16px;
+    color: $c-blue-dark;
+    font-weight: 500;
+  }
+}
+.modal__body {
+  background-color: $bg-blue-light;
+  height: calc(100% - 56px - 60px);
+  overflow-y: scroll;
+  ul {
+    padding: 10px 30px;
+  }
+  &.no-header {
+    height: calc(100% - 60px);
+  }
+}
+.modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 60px;
+  box-shadow: inset 0 1px #e3e8ee;
+  .modal__footer-locale-selector {
+    width: 100%;
+    text-align: center;
+    .MuiFormControl-root {
+      min-width: 200px !important;
+      text-align: left;
+      height: 36px;
+    }
+    .MuiOutlinedInput-root {
+      height: 100%;
+    }
+  }
+}
+.modal__change-password {
+  .row-group {
+    margin: 20px 0;
+  }
+  span {
+    width: 200px;
+  }
+}
+.modal.modal__export {
+  max-height: 350px;
+  .modal__body {
+    padding: 30px;
+  }
+  .form-group {
+    margin: 20px 0;
+  }
+}
+.surveys__view {
+  li {
+    margin-bottom: 15px;
+  }
+  h5 {
+    margin-bottom: 2px;
+    font-size: 16px;
+  }
+}
+.previewPillModal {
+  max-width: 450px !important;
+  max-height: 700px !important;
+  .modal__body {
+    background-position: bottom !important;
+    background-size: cover !important;
+  }
+}

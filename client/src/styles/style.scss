@@ -2,8 +2,10 @@
 @import './base/settings';
 @import './base/base';
 
+@import './components/buttons';
 @import './components/home';
 @import './components/login';
+@import './components/modals';
 
 @font-face {
   font-family: 'Noto-bold';

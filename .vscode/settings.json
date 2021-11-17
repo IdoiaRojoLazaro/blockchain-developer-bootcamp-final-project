@@ -14,5 +14,6 @@
         "*.js": "javascriptreact"
     },
     "javascript.suggest.autoImports": true,
-    "editor.wordWrap": "on"
+    "eslint.alwaysShowStatus": true,
+    "editor.formatOnSave": true
 }
