@@ -20,6 +20,15 @@ contract('NotesMarketContract', function (accounts) {
     price: 1500,
     commission: 10
   };
+  var noteTwo = {
+    IPFShash:
+      '0x077e6a913a751f6cebd283470a0ab47ecff2e3e80c2dc089f031f909cd617df2',
+    hash: '',
+    title: 'bliblbib',
+    author: 'Curlyyyy',
+    price: 1500,
+    commission: 10
+  };
 
   beforeEach(async () => {
     instance = await NotesMarketContract.new(admin_commission, { from: admin });
@@ -37,7 +46,6 @@ contract('NotesMarketContract', function (accounts) {
       'UserCreated',
       'user creation emitted right event'
     );
-    console.log(addUser.logs[0]);
 
     let approveSeller = await instance.approveSeller(publisher_1, {
       from: admin
@@ -99,5 +107,37 @@ contract('NotesMarketContract', function (accounts) {
         { from: publisher_1 }
       )
     );
+  });
+
+  it('Should return list of notes available', async () => {
+    await instance.addUser(true, { from: publisher_1 });
+
+    await instance.approveSeller(publisher_1, { from: admin });
+    await instance.addNote(
+      noteOne.IPFShash,
+      noteOne.title,
+      noteOne.author,
+      noteOne.price,
+      noteOne.commission,
+      { from: publisher_1 }
+    );
+
+    await instance.addNote(
+      noteTwo.IPFShash,
+      noteTwo.title,
+      noteTwo.author,
+      noteTwo.price,
+      noteTwo.commission,
+      { from: publisher_1 }
+    );
+
+    // instance
+    //   .getAvailableNotes(10, 0, { from: publisher_1 })
+    //   .then((res) => console.log(res));
+    // await catchRevert(instance.getAvailableNotes(1, 10, { from: publisher_1 }));
+    await instance
+      .getAllNotes({ from: publisher_1 })
+      .then((res) => console.log(res));
+    //await catchRevert(instance.getAllNotes({ from: publisher_1 }));
   });
 });

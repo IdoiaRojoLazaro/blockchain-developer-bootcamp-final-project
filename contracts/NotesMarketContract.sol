@@ -23,7 +23,7 @@ contract NotesMarketContract {
     notesMarketMinCommission = minCommission;
   }
 
-  Note[] private notesArr;
+  Note[] public notesArr;
 
   uint8 private notesMarketMinCommission;
 
@@ -236,5 +236,128 @@ contract NotesMarketContract {
     emit NoteRemoved("User successfully deleted");
   }
 
+  function getAllNotes() userExists(msg.sender) view external returns (Note[] memory){
+    
+    Note[] memory notes;
+    notes = notesArr;
+    return notes;
+  }
 
+  // function getAvailableNotes(uint8 _count, uint _start) userExists(msg.sender) view external returns (bytes32[] memory){
+  //   require(_count <= 50, "cannot fetch more than 50 notes at once");
+        
+  //   // get already purchased notes for removal
+  //   bytes32[] memory myPurchasedNotes = getUserPurchasedNotes(msg.sender);
+  //   bytes32[] memory newNotesPool = new bytes32[](_count);
+  //   Note memory note;
+  //   bytes32[] memory responseNotesHashes = new bytes32[](_count);
+        
+  //   do{
+  //     // get notes from pool of all notes specifying expected count and starting noteID
+  //     newNotesPool = listNotes(_start, _count);
+            
+  //     for(uint i = 0; i < newNotesPool.length; i++){
+  //       for(uint j = 0; j < myPurchasedNotes.length; j++){
+  //         note = notesArr[notesHashes[newNotesPool[i]] - 1];
+  //           // remove from fetch pool unapproved or already purchased note
+  //         if(!note.isApproved || newNotesPool[i] == myPurchasedNotes[j]){
+  //           newNotesPool[i] = bytes32(0x0);
+  //           break;
+  //         }    
+  //       }
+  //       if(responseNotesHashes.length > _count){
+  //         break;
+  //       }
+                
+  //       // if note hash is not already deleted, add to response
+  //       if(newNotesPool[i] != bytes32(0x0)){
+  //         responseNotesHashes[i] = newNotesPool[i];
+  //       }
+  //     }
+  //   }while(responseNotesHashes.length < _count);
+  //   return responseNotesHashes;
+  // }
+
+  function getUserPurchasedNotes(address userAddress) userExists(userAddress) view public returns(bytes32[] memory _boughtNotes){
+    _boughtNotes = boughtNotes[userAddress];
+  }
+
+  function listNotes(uint _start, uint _count) userExists(msg.sender) view private returns(bytes32[] memory _notesHashes) {
+    uint maxIters = _count;
+    if( (_start + _count) > notesArr.length) {
+      maxIters = notesArr.length - _start;
+    }
+
+    _notesHashes = new bytes32[](maxIters);
+
+    for(uint i=0; i < maxIters; i++) {
+      uint noteId = _start + i;
+      _notesHashes[i] = notesArr[noteId].noteHash;
+    }
+  }
+
+  // /** 
+  //    * @dev User fetches available notes using filters. Client fetches for max of 50 at a time
+  //    * @return _notesHashes IPFS Reference Hashes of available notes
+  //    */
+  //   function getAvailableNotes(uint _maxPrice, uint _minPrice, uint8 _count, uint _start) userExists(msg.sender) view external returns (bytes32[] memory){
+  //       require(_count <= 50, "cannot fetch more than 50 notes at once");
+        
+  //       // get already purchased notes for removal
+  //       bytes32[] memory myPurchasedNotes = getUserPurchasedNotes(msg.sender);
+  //       bytes32[] memory newNotesPool = new bytes32[](_count);
+  //       Note memory note;
+  //       bytes32[] memory responseNotesHashes = new bytes32[](_count);
+        
+  //       do{
+  //           // get notes from pool of all notes specifying expected count and starting noteID
+  //           newNotesPool = listNotes(_start, _count);
+            
+  //           for(uint i = 0; i < newNotesPool.length; i++){
+                
+  //               for(uint j = 0; j < myPurchasedNotes.length; j++){
+                    
+  //                   note = notesArr[notesHashes[newNotesPool[i]] - 1];
+                    
+  //                   // remove from fetch pool unapproved or already purchased note
+  //                   if(!note.isApproved || newNotesPool[i] == myPurchasedNotes[j]){
+  //                       newNotesPool[i] = bytes32(0x0);
+  //                       break;
+  //                   }    
+  //               }
+  //               if(responseNotesHashes.length > _count){
+  //                   break;
+  //               }
+                
+  //               // if note hash is not already deleted, add to response
+  //               if(newNotesPool[i] != bytes32(0x0)){
+  //                   responseNotesHashes[i] = newNotesPool[i];
+  //               }
+  //           }
+  //       }while(responseNotesHashes.length < _count);
+        
+  //       return responseNotesHashes;
+  //   }
+
+
+/** 
+     * @dev Get some notes incrementally (with range) from the large pool of notes on blockchain
+     * @param _start Note Id to start from
+     * @param _count Number of notes to fetch
+     */
+    /*function listNotes(uint _start, uint _count) userExists(msg.sender) view private returns(bytes32[] memory _notesHashes) {
+
+        uint maxIters = _count;
+        if( (_start + _count) > notesArr.length) {
+            maxIters = notesArr.length - _start;
+        }
+
+        _notesHashes = new bytes32[](maxIters);
+
+        for(uint i=0; i < maxIters; i++) {
+            uint noteId = _start + i;
+
+            _notesHashes[i] = notesArr[noteId].noteHash;
+        }
+    }*/
 }

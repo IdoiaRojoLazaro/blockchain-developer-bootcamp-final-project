@@ -30,7 +30,7 @@ const getWeb3 = () =>
         );
         const web3 = new Web3(provider);
         console.log('No web3 instance injected, using Local web3.');
-        alert('No web3 instance injected, using Local web3.');
+        //alert('No web3 instance injected, using Local web3.');
         resolve(web3);
       }
     });

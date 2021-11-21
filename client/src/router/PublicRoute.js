@@ -1,18 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Route } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 
-export const PublicRoute = ({ state, component: Component, ...rest }) => {
+export const PublicRoute = ({
+  isAuthenticated,
+  contract,
+  account,
+  component: Component,
+  ...rest
+}) => {
   return (
     <Route
       {...rest}
-      component={props => <Component {...props} state={state} />}
+      component={props =>
+        isAuthenticated ? (
+          <Redirect to="/" />
+        ) : (
+          <Component {...props} contract={contract} account={account} />
+        )
+      }
     />
   );
 };
 
 PublicRoute.propTypes = {
-  component: PropTypes.func.isRequired,
-  state: PropTypes.object.isRequired
+  isAuthenticated: PropTypes.bool.isRequired,
+  component: PropTypes.func.isRequired
 };

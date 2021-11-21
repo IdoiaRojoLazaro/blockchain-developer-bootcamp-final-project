@@ -1,32 +1,45 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router';
-import { notesList } from '../../jsons/jsons';
+import { Layout } from '../../components/layout/Layout';
 
-export const Note = () => {
+export const Note = ({ contract, account }) => {
   const { id } = useParams();
-  const listNotes = notesList;
   const [note, setNote] = useState(null);
+  const { role } = useSelector(state => state.auth);
+  const { notes } = useSelector(state => state.notes);
+
+  const handleBuy = () => {
+    console.log(contract);
+    console.log(account);
+  };
 
   useEffect(() => {
-    console.log(id);
-    setNote(listNotes.filter(item => item.id == id)[0]);
-    console.log(listNotes);
-    console.log(listNotes.filter(item => item.id == id)[0]);
+    if (notes !== null) {
+      console.log(id);
+      setNote(notes.filter(item => parseInt(item['id']) == id)[0]);
+      console.log(notes);
+      console.log(notes.filter(item => parseInt(item['id']) == id)[0]);
+    }
   }, [id]);
 
   return (
-    <div>
+    <Layout>
       <div>
-        {note && (
-          <>
-            <img src={note.url} alt={note.name} />
-            <div>
-              <p>${note.price}</p>
-              <p>{note.name}</p>
-            </div>
-          </>
-        )}
+        <div>
+          {note && (
+            <>
+              <div>
+                <p>{note.price} eth</p>
+                <p>owner: {note.owner}</p>
+                {role === 'buyer' && account !== note.owner && (
+                  <button onClick={handleBuy}>Buy</button>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 };

@@ -5,6 +5,8 @@ async function tryCatch(promise, reason) {
     await promise;
     throw null;
   } catch (error) {
+    // console.log('------- ERROR --------');
+    // console.log(error);
     assert(error, 'Expected a VM exception but did not get one');
     assert(
       error.message.search(errorString + reason) >= 0,

@@ -7,6 +7,13 @@ const initialState = {
 
 export const authReducer = (state = initialState, action) => {
   switch (action.type) {
+    case types.authNoMetamaskInstalled:
+      return {
+        ...state,
+        checking: false,
+        connection: false
+      };
+
     case types.authLogin:
       return {
         ...state,
