@@ -1,25 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router';
+import { useToasts } from 'react-toast-notifications';
 import { Layout } from '../../components/layout/Layout';
 
 export const Note = ({ contract, account }) => {
   const { id } = useParams();
   const [note, setNote] = useState(null);
-  const { role } = useSelector(state => state.auth);
+  const { role, balance } = useSelector(state => state.auth);
   const { notes } = useSelector(state => state.notes);
+  const { addToast } = useToasts();
 
-  const handleBuy = () => {
-    console.log(contract);
-    console.log(account);
+  const handleBuy = (e, noteHash) => {
+    e.preventDefault();
+    let response = contract.methods.buyNote(noteHash).send({
+      from: account,
+      value: balance
+    });
+    response.then(txn => {
+      console.log('Note bought: ', txn);
+      if (txn.status && txn.events.NoteBought) {
+        addToast('Note bought successfully', {
+          appearance: 'success',
+          autoDismiss: true
+        });
+      }
+    });
   };
 
   useEffect(() => {
     if (notes !== null) {
-      console.log(id);
       setNote(notes.filter(item => parseInt(item['id']) == id)[0]);
-      console.log(notes);
-      console.log(notes.filter(item => parseInt(item['id']) == id)[0]);
     }
   }, [id]);
 
@@ -33,7 +44,11 @@ export const Note = ({ contract, account }) => {
                 <p>{note.price} eth</p>
                 <p>owner: {note.owner}</p>
                 {role === 'buyer' && account !== note.owner && (
-                  <button onClick={handleBuy}>Buy</button>
+                  <button
+                    className="btn"
+                    onClick={e => handleBuy(e, note.noteHash)}>
+                    Buy
+                  </button>
                 )}
               </div>
             </>

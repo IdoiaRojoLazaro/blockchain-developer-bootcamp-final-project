@@ -9,12 +9,12 @@ const Home = ({ contract, account }) => {
   const dispatch = useDispatch();
 
   const history = useHistory();
-  const role = useSelector(state => state.auth);
+  const { role } = useSelector(state => state.auth);
   const [newNoteModal, setNewNoteModal] = useState(false);
   const { notes } = useSelector(state => state.notes);
 
   useEffect(() => {
-    if (contract !== null && account !== null) {
+    if (contract !== null && account !== '') {
       contract.methods
         .getAllNotes()
         .call({ from: account })
@@ -34,18 +34,14 @@ const Home = ({ contract, account }) => {
   };
 
   return (
-    // <Container className="mt-5">
-    //   {isWalletConnectModalOpen && <ConnectWalletModal />}
-    //   <CompInteractionCard />
-    // </Container>
     <Layout>
       <div>
         {role === 'seller' && (
-          <button
-            className="btn btn-primary"
-            onClick={() => setNewNoteModal(true)}>
-            Add new note
-          </button>
+          <p className="text-right">
+            <button className="btn" onClick={() => setNewNoteModal(true)}>
+              Add new note
+            </button>
+          </p>
         )}
 
         <div className="notes__container">
@@ -55,7 +51,9 @@ const Home = ({ contract, account }) => {
                 className="note"
                 key={i}
                 onClick={e => handleClick(e, note['id'])}>
-                <p>{note['price']} eth</p>
+                <p className="title">{note['title']}</p>
+                <p>{note['author']}</p>
+                <p className="price">{note['price']}eth</p>
               </div>
             ))}
 

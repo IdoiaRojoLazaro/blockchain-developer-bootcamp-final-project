@@ -7,6 +7,7 @@ export const PublicRoute = ({
   isAuthenticated,
   contract,
   account,
+  balance,
   component: Component,
   ...rest
 }) => {
@@ -17,7 +18,12 @@ export const PublicRoute = ({
         isAuthenticated ? (
           <Redirect to="/" />
         ) : (
-          <Component {...props} contract={contract} account={account} />
+          <Component
+            {...props}
+            contract={contract}
+            account={account}
+            balance={balance}
+          />
         )
       }
     />

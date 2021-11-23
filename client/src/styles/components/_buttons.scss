@@ -2,6 +2,7 @@ button {
   background: none;
   border: 0;
   padding: 5px 10px;
+  color: $c-blue-primary;
   &:hover,
   &:focus {
     outline: none;
@@ -14,88 +15,8 @@ button {
   line-height: 28px;
   min-height: 44px;
   transition: all 0.2s;
-  &.btn-primary {
-    background-color: #274ba0;
-    color: rgb(255, 255, 255);
-  }
-  &.btn-actions {
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 20px;
-    background-color: $btn-blue-active;
-    height: 28px;
-    min-height: 28px;
-    padding: 0 10px;
-    &.btn-icon {
-      padding: 0 5px;
-      height: 26px;
-      min-height: 26px;
-    }
-  }
-  &.btn-save {
-    color: #fff;
-    background-color: $btn-blue-active;
-    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-      rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.12) 0px 1px 1px 0px,
-      rgb(84, 105, 212) 0px 0px 0px 1px, rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-      rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(60, 66, 87, 0.08) 0px 2px 5px 0px;
-    &:hover,
-    &:focus {
-      background-color: darken($color: $btn-blue-active, $amount: 20);
-      box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-        rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.12) 0px 1px 1px 0px,
-        rgb(84, 105, 212) 0px 0px 0px 1px, rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-        rgba(60, 66, 87, 0.08) 0px 3px 9px 0px,
-        rgba(60, 66, 87, 0.08) 0px 2px 5px 0px;
-    }
-  }
-  &.btn-white {
-    color: $c-blue-primary;
-    background: #fff;
-    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-      rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.12) 0px 1px 1px 0px,
-      rgba(60, 66, 87, 0.16) 0px 0px 0px 1px, rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-      rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(60, 66, 87, 0.08) 0px 2px 5px 0px;
-    &:hover,
-    &:focus {
-      box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-        rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.12) 0px 1px 1px 0px,
-        rgba(60, 66, 87, 0.16) 0px 0px 0px 1px, rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-        rgba(60, 66, 87, 0.08) 0px 3px 9px 0px,
-        rgba(60, 66, 87, 0.08) 0px 2px 5px 0px;
-      color: darken($color: $c-blue-primary, $amount: 20);
-    }
-  }
-  &.btn-small {
-    margin-left: 10px;
-    padding: 0 10px;
-    height: 28px;
-    font-size: 14px;
-    min-height: unset;
-    display: flex;
-    align-items: center;
-    svg {
-      margin-right: 5px;
-    }
-  }
-  &.btn-one-option {
-    margin: 10px 0;
-  }
-  &.btn-outline {
-    background: transparent;
-    border: 1px solid $c-blue-primary;
-  }
-  &.btn-warning {
-    background: transparent;
-    color: lighten($color: $c-error, $amount: 20);
-    border: 1px solid lighten($color: $c-error, $amount: 20);
-    transition: all 0.2s;
-    &:hover,
-    &:focus {
-      color: $c-error;
-      border: 1px solid $c-error;
-    }
-  }
+  border: 1px solid $c-blue-primary;
+  font-family: 'Cutive';
 }
 
 .group-icons-buttons {

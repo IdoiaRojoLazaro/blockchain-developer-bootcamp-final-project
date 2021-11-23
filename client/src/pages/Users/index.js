@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router';
+import { useToasts } from 'react-toast-notifications';
 
 export const UsersScreen = ({ contract, account }) => {
+  const history = useHistory();
   const [accountSeller, setAccountSeller] = useState('');
+  const { addToast } = useToasts();
   const handleChange = ({ target }) => {
     setAccountSeller(target.value);
   };
@@ -10,8 +14,17 @@ export const UsersScreen = ({ contract, account }) => {
     let response = contract.methods
       .approveSeller(accountSeller)
       .send({ from: account });
-    response.then(result => {
-      console.log('approved user: ', result);
+    response.then(txn => {
+      console.log('txn seller approved: ', txn);
+      if (txn.status && txn.events.UserSellerApproved) {
+        addToast('Seller approved successfully', {
+          appearance: 'success',
+          autoDismiss: true
+        });
+        setTimeout(() => {
+          history.push('/');
+        }, 1000);
+      }
     });
   };
 

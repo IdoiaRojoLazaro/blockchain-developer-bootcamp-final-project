@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import IPFSGatewayTools from '@pinata/ipfs-gateway-tools/dist/browser';
 import axios from 'axios';
 
 import Modal from 'react-modal';
 import ButtonSubmit from '../../components/shared/ButtonSubmit';
 import { getBytes32FromIpfsHash } from '../../utils/ipfsHashHelper';
+import { useToasts } from 'react-toast-notifications';
+import Swal from 'sweetalert2';
 
 const customStyles = {
   content: {
@@ -30,7 +31,7 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
   const [fileUploaded, setFileUploaded] = useState(null);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const { title, author, price, commission } = formValues;
-  console.log(account);
+  const { addToast } = useToasts();
 
   const retrieveFile = e => {
     e.preventDefault();
@@ -56,11 +57,17 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
       let response = contract.methods
         .addNote(IPFShash, title, author, price, commission)
         .send({ from: account });
-      response.then(result => {
-        console.log('add book: ', result);
+      response.then(txn => {
+        console.log('txn note added: ', txn);
+        if (txn.status && txn.events.NoteAdded) {
+          addToast('The note has successfully uploaded', {
+            appearance: 'success',
+            autoDismiss: true
+          });
+          closeModal();
+        }
       });
     });
-    //closeModal();
   };
 
   const uploadFilePinata = () => {
@@ -78,24 +85,6 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
       }
     });
     formData.append('pinataMetadata', metadata);
-    //pinataOptions are optional
-    const pinataOptions = JSON.stringify({
-      cidVersion: 0,
-      customPinPolicy: {
-        regions: [
-          {
-            id: 'FRA1',
-            desiredReplicationCount: 1
-          },
-          {
-            id: 'NYC1',
-            desiredReplicationCount: 2
-          }
-        ]
-      }
-    });
-    formData.append('pinataOptions', pinataOptions);
-
     return axios
       .post(url, formData, {
         maxBodyLength: 'Infinity', //this is needed to prevent axios from erroring out with large files
@@ -106,14 +95,12 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
         }
       })
       .then(function (response) {
-        console.log(response);
         let IpfsHash = response.data.IpfsHash;
-        console.log(IpfsHash);
         return IpfsHash;
-        //handle response here
       })
       .catch(function (error) {
-        //handle error here
+        console.log(error);
+        Swal.fire('Error', error, 'error');
       });
   };
 

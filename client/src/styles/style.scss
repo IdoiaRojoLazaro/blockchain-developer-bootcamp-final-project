@@ -26,3 +26,10 @@
     url('./fonts/NotoSans-Regular.ttf') format('truetype');
   font-weight: normal;
 }
+
+@font-face {
+  font-family: 'Cutive';
+  src: local('Noto-bold'),
+    url('./fonts/CutiveMono-Regular.ttf') format('truetype');
+  font-weight: normal;
+}

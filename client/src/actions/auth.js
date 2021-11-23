@@ -1,10 +1,5 @@
 import { types } from '../types/types';
-import Swal from 'sweetalert2';
-// import { catchApiError } from '../helpers/catchApiError';
 
-export const noMetamaskInstalled = () => ({
-  type: types.authNoMetamaskInstalled
-});
 export const logout = () => ({ type: types.authLogout });
 
 export const startChecking = () => {

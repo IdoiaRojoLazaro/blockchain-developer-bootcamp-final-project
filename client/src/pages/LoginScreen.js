@@ -1,71 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { useWeb3React } from '@web3-react/core';
-import MetamaskConnectButton from '../components/MetamaskConnectButton';
-import NotesMarketContract from '../contracts/NotesMarketContract.json';
-import getWeb3 from '../getWeb3';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { types } from '../types/types';
 import { useHistory } from 'react-router';
-import { contractInstance, accountsWeb3 } from '../lazycorner';
+import { cropAccountString } from '../utils/generalFunctions';
+import { Spinner } from 'phosphor-react';
+import { Title } from '../components/shared/Title';
 
-export const LoginScreen = ({ contract, account }) => {
+export const LoginScreen = ({ contract, account, balance }) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  //const { activate, active, account, deactivate } = useWeb3React();
-  //const { account, contract, balance } = state;
-  //console.log(state);
-  // const [contract, setContract] = useState(null);
-  // const [account, setAccount] = useState(null);
-  // const [balance, setBalance] = useState(null);
-
-  // useEffect(() => {
-  //   const init = async () => {
-  //     const instance = await contractInstance;
-  //     const accounts = await accountsWeb3;
-
-  //     console.log('instance');
-  //     console.log(instance);
-  //     setContract(instance);
-  //     console.log('account');
-  //     console.log(accounts[0]);
-  //     setAccount(accounts[0]);
-
-  //     // const manager = await lottery.methods.manager().call();
-  //     // const players = await lottery.methods.getPlayers().call();
-  //     // const balance = await web3.eth.getBalance(lottery.options.address);
-
-  //     // setManager(manager);
-  //     // setPlayers(players);
-  //     // setContractBalance(balance);
-  //   };
-  //   init();
-  // }, []);
-
-  // const [state, setState] = useState({
-  //   storageValue: 0,
-  //   web3: null,
-  //   accounts: null,
-  //   contract: null
-  // });
-
-  useEffect(() => {
-    async function init() {
-      try {
-        const web3 = await getWeb3();
-        const accounts = await web3.eth.getAccounts();
-
-        //setState(value => ({ ...value, web3, accounts, contract: instance }));
-      } catch (error) {
-        alert(
-          'Failed to load web3, accounts, or contract. Check console for details.'
-        );
-        console.error(error);
-      }
-    }
-    if (account === null) {
-      init();
-    }
-  }, []);
+  const { checking } = useSelector(state => state.auth);
 
   const addNewUser = async noteOwner => {
     console.log(' ------- ------ -------- ------- ');
@@ -82,9 +26,10 @@ export const LoginScreen = ({ contract, account }) => {
           type: types.authLogin,
           payload: {
             account: account,
-            //balance: balance,
+            balance: balance,
             isAuthenticated: true,
-            role: role
+            role: role,
+            uid: 1
           }
         });
         history.push('/');
@@ -118,8 +63,10 @@ export const LoginScreen = ({ contract, account }) => {
           type: types.authLogin,
           payload: {
             account: account,
-            //balance: balance,
-            role: role
+            balance: balance,
+            role: role,
+            isAuthenticated: true,
+            uid: 1
           }
         });
 
@@ -132,73 +79,56 @@ export const LoginScreen = ({ contract, account }) => {
         alert('You have no account registered');
       });
   };
-  const connectToMetamask = async e => {
-    e.preventDefault();
-    console.log('---------------------------');
-    const web3 = await getWeb3();
-    console.log(web3);
-    console.log('jolines');
-  };
-
-  // const connectToMetamask = () => {
-  //   console.log('---------------------------');
-  //   try {
-  //     const web3 = getWeb3().then(res => {
-  //       const accounts = web3.eth.getAccounts();
-  //       let balance = null;
-  //       web3.eth.getBalance(accounts[0], function (error, wei) {
-  //         if (!error) {
-  //           balance = web3.utils.fromWei(wei, 'ether');
-  //         }
-  //       });
-  //       //.then((res, wei) => {});
-
-  //       const networkId = web3.eth.net.getId();
-  //       const deployedNetwork = NotesMarketContract.networks[networkId];
-  //       const instance = new web3.eth.Contract(
-  //         NotesMarketContract.abi,
-  //         deployedNetwork && deployedNetwork.address
-  //       );
-  //       instance.options.address = process.env.REACT_APP_CONTRACT_ADDR;
-
-  //       // setState(value => ({
-  //       //   ...value,
-  //       //   web3,
-  //       //   accounts,
-  //       //   account: accounts[0],
-  //       //   balance,
-  //       //   contract: instance
-  //       // }));
-  //       console.log(instance);
-  //       dispatch({
-  //         type: types.setContract,
-  //         payload: instance
-  //       });
-  //     });
-  //   } catch (error) {
-  //     alert(
-  //       'Failed to load web3, accounts, or contract. Check console for details.'
-  //     );
-  //     console.error(error);
-  //   }
-  // };
 
   return (
     <div className="login">
-      <h2>The lazy corner</h2>
-      <p>You must provide a metamask account to enter the market</p>
-      <MetamaskConnectButton />
-      {/* <button onClick={connectToMetamask}>Connect to metamask</button> */}
-      <p>{account}</p>
-      {/*<p>{balance}</p> */}
-      {account && (
-        <>
-          <button onClick={getUser}>I already have an account</button>
-          <hr />
-          <button onClick={() => addNewUser(false)}>Login as Buyer</button>
-          <button onClick={() => addNewUser(true)}>Login as Seller</button>
-        </>
-      )}
+      <div className="home__navbar">
+        <div></div>
+        {account ? (
+          <button className="btn btn-account">
+            {cropAccountString(account)}
+          </button>
+        ) : (
+          <button className="btn">Connect</button>
+        )}
+      </div>
+      <div>
+        <Title />
+        <p>
+          You must provide a <b>metamask</b> account to enter the market
+        </p>
+        {checking && (
+          <div className="loading">
+            <Spinner weight="duotone" size={60}>
+              <animate
+                attributeName="opacity"
+                values="0;1;0"
+                dur="4s"
+                repeatCount="indefinite"></animate>
+              <animateTransform
+                attributeName="transform"
+                attributeType="XML"
+                type="rotate"
+                dur="5s"
+                from="0 0 0"
+                to="360 0 0"
+                repeatCount="indefinite"></animateTransform>
+            </Spinner>
+            <h5>Waiting for connection with metamask...</h5>
+          </div>
+        )}
+        <div className="login-actions flex">
+          {account && (
+            <>
+              <button onClick={getUser}>I have an account</button>
+              <p>{'<<'}</p>
+              <button onClick={() => addNewUser(false)}>Login as Buyer</button>
+              <p>{'<<'}</p>
+              <button onClick={() => addNewUser(true)}>Login as Seller</button>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

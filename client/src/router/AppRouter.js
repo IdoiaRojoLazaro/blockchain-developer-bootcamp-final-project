@@ -7,58 +7,77 @@ import { PrivateRoute } from './PrivateRoute';
 import Home from '../pages/Home';
 import { UsersScreen } from '../pages/Users';
 import { LoginScreen } from '../pages/LoginScreen';
-import { NewNoteScreen } from '../pages/Note/NewNoteScreen';
 import { Note } from '../pages/Note';
 
 import { Spinner, WarningCircle, ArrowsClockwise } from 'phosphor-react';
 import { types } from '../types/types';
 import { useHistory } from 'react-router';
-import { contractInstance, accountsWeb3 } from '../lazycorner';
+import { contractInstance } from '../lazycorner';
+import web3 from '../web3';
+import { Title } from '../components/shared/Title';
+import NotesMarketContract from '../contracts/NotesMarketContract.json';
+import { getContractAddress } from '@ethersproject/address';
+const { utils } = require('ethers');
 
 export const AppRouter = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [contract, setContract] = useState(null);
-  const [account, setAccount] = useState(null);
-  const [balance, setBalance] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [account, setAccount] = useState('');
+  const [balance, setBalance] = useState('');
+  //const [isLoading, setIsLoading] = useState(true);
 
   const refreshPage = () => window.location.reload();
 
-  const { checking, connection } = useSelector(state => state.auth);
+  const { checking, status, uid } = useSelector(state => state.auth);
+
+  const isAuthenticated = localStorage.getItem('isAuthenticated')
+    ? true
+    : false;
 
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('isAuthenticated')
-      ? true
-      : false;
-    setIsAuthenticated(isAuthenticated);
+    async function connectToWeb3() {
+      await web3()
+        .then(web3 => {
+          web3.eth.getAccounts().then(accounts => {
+            setAccount(accounts[0]);
+            web3.eth.getBalance(accounts[0]).then(balanceValue => {
+              let balanceFormat = utils.formatEther(balanceValue);
+              setBalance(balanceFormat);
+              getContract(accounts[0], balanceFormat);
+            });
+            dispatch({
+              type: types.authWeb3Injected
+            });
+          });
+        })
+        .catch(e => {
+          console.log('problemitas');
+
+          dispatch({
+            type: types.authNoWeb3Injected
+          });
+        });
+    }
+    connectToWeb3();
   }, []);
 
-  useEffect(() => {
-    const init = async () => {
-      const instance = await contractInstance;
-      const accounts = await accountsWeb3;
+  const getContract = async (acc, bal) => {
+    const instance = await contractInstance;
+    setContract(instance);
+    getUser(acc, instance, bal);
+  };
 
-      console.log('instance');
-      console.log(instance);
-      setContract(instance);
-      console.log('account');
-      console.log(accounts[0]);
-      setAccount(accounts[0]);
-      setIsLoading(false);
-    };
-    init();
-  }, []);
-
-  useEffect(() => {
-    if (isAuthenticated && contract !== null && account !== null) {
+  const getUser = async (account, contract, balance) => {
+    if (
+      isAuthenticated &&
+      contract !== null &&
+      account !== null &&
+      balance !== null
+    ) {
       contract.methods
         .getUser()
         .call({ from: account })
         .then(res => {
-          console.log('user');
-          console.log(res);
           const role = res._isAdmin
             ? 'admin'
             : res._isSeller
@@ -70,114 +89,43 @@ export const AppRouter = () => {
             payload: {
               account: account,
               balance: balance,
-              role: role
+              role: role,
+              uid: 1
             }
           });
         });
+      dispatch({
+        type: types.authFinishLoading
+      });
+      //setIsLoading(false);
     }
-  }, [isAuthenticated, account]);
+  };
 
-  // useEffect(() => {
-  //   if (state.web3 !== null && state.accounts !== null && state.contract) {
-  //     let user = state.contract.methods
-  //       .getUser()
-  //       .call({ from: state.accounts[0] })
-  //       .then(res => {
-  //         console.log(res);
-  //         if (res._authStatus) {
-  //           //history.push('/');
-  //         }
-  //       });
-  //     console.log('user');
-  //     console.log(user);
-  //     // dispatch({
-  //     //   type: types.authLogin,
-  //     //   payload: {
-  //     //     account: state.accounts[0]
-  //     //   }
-  //     // });
-  //   }
-  // }, [state.storageValue, state.web3, state.accounts]);
-
-  // useEffect(() => {
-  //   async function init() {
-  //     console.log('---------------------------');
-  //     try {
-  //       const web3 = await getWeb3();
-  //       console.log(web3);
-  //       const accounts = await web3.eth.getAccounts();
-  //       let balance = null;
-  //       web3.eth.getBalance(accounts[0], function (error, wei) {
-  //         if (!error) {
-  //           balance = web3.utils.fromWei(wei, 'ether');
-  //         }
-  //       });
-  //       //.then((res, wei) => {});
-
-  //       const networkId = await web3.eth.net.getId();
-  //       const deployedNetwork = NotesMarketContract.networks[networkId];
-  //       const instance = new web3.eth.Contract(
-  //         NotesMarketContract.abi,
-  //         deployedNetwork && deployedNetwork.address
-  //       );
-  //       instance.options.address = process.env.REACT_APP_CONTRACT_ADDR;
-
-  //       setState(value => ({
-  //         ...value,
-  //         web3,
-  //         accounts,
-  //         account: accounts[0],
-  //         balance,
-  //         contract: instance
-  //       }));
-  //     } catch (error) {
-  //       alert(
-  //         'Failed to load web3, accounts, or contract. Check console for details.'
-  //       );
-  //       console.error(error);
-  //     }
-  //   }
-  //   debugger;
-  //   if (checking) {
-  //     init();
-  //   }
-  // }, []);
-
-  // if (checking) {
-  //   return (
-  //     <div className="loading">
-  //       <Spinner weight="duotone" size={60}>
-  //         <animate
-  //           attributeName="opacity"
-  //           values="0;1;0"
-  //           dur="4s"
-  //           repeatCount="indefinite"></animate>
-  //         <animateTransform
-  //           attributeName="transform"
-  //           attributeType="XML"
-  //           type="rotate"
-  //           dur="5s"
-  //           from="0 0 0"
-  //           to="360 0 0"
-  //           repeatCount="indefinite"></animateTransform>
-  //       </Spinner>
-  //       <h5>Waiting for connection with backend...</h5>
-  //     </div>
-  //   );
-  // }
-  if (isLoading) {
+  if (checking) {
     return (
       <div className="loading">
-        <WarningCircle size={60} />
-        <h5>No connection with metamask...</h5>
-        <p>You must have metamask installed to continue ...</p>
-        <button className="btn btn-save" onClick={refreshPage}>
-          <ArrowsClockwise size={18} color="#fff" />
-          Click to reload!
-        </button>
+        <Title />
+        <h5>Waiting for connection with metamask...</h5>
+        <Spinner weight="duotone" size={60}>
+          <animate
+            attributeName="opacity"
+            values="0;1;0"
+            dur="4s"
+            repeatCount="indefinite"></animate>
+          <animateTransform
+            attributeName="transform"
+            attributeType="XML"
+            type="rotate"
+            dur="5s"
+            from="0 0 0"
+            to="360 0 0"
+            repeatCount="indefinite"></animateTransform>
+        </Spinner>
       </div>
     );
-  } else {
+  }
+
+  if (status === types.completed) {
     return (
       <div>
         <Router>
@@ -187,34 +135,38 @@ export const AppRouter = () => {
                 exact
                 path="/login"
                 component={LoginScreen}
-                isAuthenticated={!!isAuthenticated}
+                isAuthenticated={!!uid}
                 contract={contract}
                 account={account}
+                balance={balance}
               />
               {/* -------- Private routes -------- */}
               <PrivateRoute
                 exact
                 path="/"
                 component={Home}
-                isAuthenticated={!!isAuthenticated}
+                isAuthenticated={!!uid}
                 contract={contract}
                 account={account}
+                balance={balance}
               />
               <PrivateRoute
                 exact
                 path="/users"
                 component={UsersScreen}
-                isAuthenticated={!!isAuthenticated}
+                isAuthenticated={!!uid}
                 contract={contract}
                 account={account}
+                balance={balance}
               />
               <PrivateRoute
                 exact
                 path="/note/:id"
                 component={Note}
-                isAuthenticated={!!isAuthenticated}
+                isAuthenticated={!!uid}
                 contract={contract}
                 account={account}
+                balance={balance}
               />
               {/* <PublicRoute
               exact
@@ -227,6 +179,21 @@ export const AppRouter = () => {
             </Switch>
           </div>
         </Router>
+      </div>
+    );
+  }
+
+  if (status === types.loading) {
+    return (
+      <div className="loading">
+        <Title />
+        <WarningCircle size={60} />
+        <h5>No connection with metamask...</h5>
+        <p>You must have metamask installed to continue ...</p>
+        <button className="btn btn-save" onClick={refreshPage}>
+          <ArrowsClockwise size={18} color="#fff" />
+          Click to reload!
+        </button>
       </div>
     );
   }

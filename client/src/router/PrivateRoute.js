@@ -7,6 +7,7 @@ export const PrivateRoute = ({
   isAuthenticated,
   contract,
   account,
+  balance,
   component: Component,
   ...rest
 }) => {
@@ -19,7 +20,12 @@ export const PrivateRoute = ({
       {...rest}
       component={props =>
         isAuthenticated ? (
-          <Component {...props} contract={contract} account={account} />
+          <Component
+            {...props}
+            contract={contract}
+            account={account}
+            balance={balance}
+          />
         ) : (
           <Redirect to="/login" />
         )

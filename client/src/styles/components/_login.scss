@@ -4,4 +4,40 @@
   justify-content: center;
   flex-direction: column;
   height: 100vh;
+  text-align: center;
+  .btn {
+    min-height: auto;
+    padding: 10px;
+    line-height: 12px;
+  }
+  .home__navbar {
+    border-bottom: 0;
+    box-shadow: none;
+  }
+  .login-actions {
+    margin-top: 60px;
+    min-height: 40px;
+    button {
+      position: relative;
+      &:after {
+        width: 0;
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: $c-blue-primary;
+        transition: width 0.2s ease;
+      }
+      &:hover:after {
+        width: 100%;
+      }
+      // border-bottom: 1px solid transparent;
+      // &:hover {
+      //   animation: increase 0.2s;
+      //   border-bottom: 1px solid ;
+      // }
+    }
+  }
 }
