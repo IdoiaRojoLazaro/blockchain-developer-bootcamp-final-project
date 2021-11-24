@@ -32,7 +32,8 @@ export const authReducer = (state = initialState, action) => {
     case types.authLogin:
       return {
         ...state,
-        ...action.payload
+        ...action.payload,
+        status: types.completed
       };
 
     // case types.authCheckingFinish:

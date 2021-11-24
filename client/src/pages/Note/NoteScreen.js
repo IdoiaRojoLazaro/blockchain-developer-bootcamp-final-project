@@ -4,7 +4,7 @@ import { useParams } from 'react-router';
 import { useToasts } from 'react-toast-notifications';
 import { Layout } from '../../components/layout/Layout';
 
-export const Note = ({ contract, account }) => {
+export const NoteScreen = ({ contract, account }) => {
   const { id } = useParams();
   const [note, setNote] = useState(null);
   const { role, balance } = useSelector(state => state.auth);
@@ -14,8 +14,7 @@ export const Note = ({ contract, account }) => {
   const handleBuy = (e, noteHash) => {
     e.preventDefault();
     let response = contract.methods.buyNote(noteHash).send({
-      from: account,
-      value: balance
+      from: account
     });
     response.then(txn => {
       console.log('Note bought: ', txn);

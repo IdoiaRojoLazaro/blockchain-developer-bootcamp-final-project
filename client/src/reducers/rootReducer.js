@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux';
 import { authReducer } from './authReducer';
-import { contractReducer } from './contractReducer';
+import { modalsReducer } from './modalsReducer';
 import { notesReducer } from './notesReducer';
 
 export const rootReducer = combineReducers({
   auth: authReducer,
-  contract: contractReducer,
+  modals: modalsReducer,
   notes: notesReducer
 });

@@ -2,29 +2,30 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter as Router, Switch, Redirect } from 'react-router-dom';
 
+import web3 from '../web3';
+import { contractInstance } from '../lazycorner';
+
 import { PublicRoute } from './PublicRoute';
 import { PrivateRoute } from './PrivateRoute';
-import Home from '../pages/Home';
-import { UsersScreen } from '../pages/Users';
+
 import { LoginScreen } from '../pages/LoginScreen';
-import { Note } from '../pages/Note';
 
-import { Spinner, WarningCircle, ArrowsClockwise } from 'phosphor-react';
+import { UsersScreen } from '../pages/Users';
+
 import { types } from '../types/types';
-import { useHistory } from 'react-router';
-import { contractInstance } from '../lazycorner';
-import web3 from '../web3';
-import { Title } from '../components/shared/Title';
-import NotesMarketContract from '../contracts/NotesMarketContract.json';
-import { getContractAddress } from '@ethersproject/address';
-const { utils } = require('ethers');
 
+import { Title } from '../components/shared/Title';
+import { LogoBig } from '../components/shared/LogoBig';
+import { Spinner, WarningCircle, ArrowsClockwise } from 'phosphor-react';
+import { NoteScreen } from '../pages/Note/NoteScreen';
+import { HomeScreen } from '../pages/Home/HomeScreen';
+
+const { utils } = require('ethers');
 export const AppRouter = () => {
   const dispatch = useDispatch();
   const [contract, setContract] = useState(null);
   const [account, setAccount] = useState('');
   const [balance, setBalance] = useState('');
-  //const [isLoading, setIsLoading] = useState(true);
 
   const refreshPage = () => window.location.reload();
 
@@ -94,9 +95,9 @@ export const AppRouter = () => {
             }
           });
         });
-      dispatch({
-        type: types.authFinishLoading
-      });
+      // dispatch({
+      //   type: types.authFinishLoading
+      // });
       //setIsLoading(false);
     }
   };
@@ -104,6 +105,7 @@ export const AppRouter = () => {
   if (checking) {
     return (
       <div className="loading">
+        <LogoBig />
         <Title />
         <h5>Waiting for connection with metamask...</h5>
         <Spinner weight="duotone" size={60}>
@@ -144,7 +146,7 @@ export const AppRouter = () => {
               <PrivateRoute
                 exact
                 path="/"
-                component={Home}
+                component={HomeScreen}
                 isAuthenticated={!!uid}
                 contract={contract}
                 account={account}
@@ -162,7 +164,7 @@ export const AppRouter = () => {
               <PrivateRoute
                 exact
                 path="/note/:id"
-                component={Note}
+                component={NoteScreen}
                 isAuthenticated={!!uid}
                 contract={contract}
                 account={account}

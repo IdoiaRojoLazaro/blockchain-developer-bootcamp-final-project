@@ -5,6 +5,10 @@ export const types = {
   completed: '[status] completed',
   failed: '[status] failed',
 
+  //modals
+  openModalAS: '[modals] open approve seller modal',
+  closeModalAS: '[modals] close approve seller modal',
+
   // auth
   authNoMetamaskInstalled: '[auth] authNoMetamaskInstalled',
   authNoWeb3Injected: '[auth] authNoWeb3Injected',
@@ -18,9 +22,6 @@ export const types = {
   authStartTokenRenew: '[auth] Start token renew',
   authLogout: '[auth] Logout',
   login: '[auth] login',
-
-  //contract
-  setContract: '[contract] set contract',
 
   //notes
   setNotes: '[notes] set notes'

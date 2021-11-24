@@ -71,7 +71,7 @@ contract('NotesMarketContract', function (accounts) {
     );
   });
 
-  it('Should revert if a reader (not seller) tries to add a new book', async () => {
+  it('Should revert if a reader (not seller) tries to add a new note', async () => {
     await instance.addUser(true, { from: reader_1 });
     await catchRevert(
       instance.addNote(
@@ -139,5 +139,76 @@ contract('NotesMarketContract', function (accounts) {
       .getAllNotes({ from: publisher_1 })
       .then((res) => console.log(res));
     //await catchRevert(instance.getAllNotes({ from: publisher_1 }));
+  });
+
+  it('...should charge required fee for note and refund excess', async () => {
+    //add seller
+    await instance.addUser(true, { from: publisher_1 });
+    //add reader
+    await instance.addUser(false, { from: reader_1 });
+
+    await instance.approveSeller(publisher_1, { from: admin });
+    let newNote = await instance.addNote(
+      noteOne.IPFShash,
+      noteOne.title,
+      noteOne.author,
+      noteOne.price,
+      noteOne.commission,
+      { from: publisher_1 }
+    );
+    let newNoteHash = newNote.logs[0].args.noteHash;
+    //console.log(newNote.logs);
+
+    let ownedNotes = await instance.getOwnedNotes({ from: publisher_1 });
+    assert(ownedNotes.length, 1, 'publisher owned notes count must be 1');
+
+    //initial balances
+    let reader_1BalanceBefore = await web3.eth.getBalance(reader_1);
+    let adminBalanceBefore = await web3.eth.getBalance(admin);
+    let publisher_1BalanceBefore = await web3.eth.getBalance(publisher_1);
+
+    let noteBought = await instance.buyNote(newNoteHash, {
+      from: reader_1,
+      value: 2500
+    });
+    //console.log(noteBought.logs);
+    assert(
+      noteBought.logs[0].event,
+      'NoteBought',
+      'must emit NoteBought after successful purchase'
+    );
+
+    // final balances
+    let publisher_1BalanceAfter = await web3.eth.getBalance(publisher_1);
+    let reader_1BalanceAfter = await web3.eth.getBalance(reader_1);
+    let adminBalanceAfter = await web3.eth.getBalance(admin);
+
+    let commissionFee = new BN(noteOne.price)
+      .mul(new BN(noteOne.commission * 100))
+      .div(new BN(10000));
+    let paymentToSeller = new BN(noteOne.price).sub(new BN(commissionFee));
+
+    //console.log('sent: ', 2500, 'price: ', noteOne.price, 'commission: ', commissionFee, 'sellerPayment: ', paymentToSeller);
+
+    let purchasedNotes = await instance.getMyPurchasedNotes({ from: reader_1 });
+    assert(purchasedNotes.length, 1, 'reader purchased notes count must be 1');
+
+    assert.equal(
+      new BN(publisher_1BalanceAfter).toString(),
+      new BN(publisher_1BalanceBefore).add(paymentToSeller).toString(),
+      "publisher_1's balance should be increased by price of note minus commission"
+    );
+
+    assert.equal(
+      new BN(adminBalanceAfter).toString(),
+      new BN(adminBalanceBefore).add(commissionFee).toString(),
+      "noteshop's balance should be increased by commission fee of note"
+    );
+
+    assert.isBelow(
+      Number(reader_1BalanceAfter),
+      Number(new BN(reader_1BalanceBefore).sub(new BN(noteOne.price))),
+      "reader_1's balance should be decreased by price of note and gas cost"
+    );
   });
 });

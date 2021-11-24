@@ -267,17 +267,20 @@ contract NotesMarketContract {
     Note memory note = notesArr[noteId - 1];
     
     address payable seller = note.owner;
-
-    uint paymentToSeller = note.price;
-
-    boughtNotes[msg.sender].push(noteHash);
-
-    seller.transfer(paymentToSeller);
+    
+    uint commissionFunds = note.price.mul(note.commission).div(10000);
+    uint paymentToSeller = note.price.sub(commissionFunds);
     bytes32 accessToken = generateAccessToken(msg.sender, note.IPFSHash);
     // store access token
     purchaseTokens[noteHash][msg.sender] = accessToken;
+    // keep note purchase
+    boughtNotes[msg.sender].push(noteHash);
 
-    emit NoteBought("Note successfully bought", noteHash, msg.sender, seller);
+    seller.transfer(paymentToSeller);
+    admin.transfer(commissionFunds);        
+    
+    emit NoteBought("note bought", noteHash, msg.sender, seller);
+
   }
 
   function getMyPurchasedNotes() userExists(msg.sender) view public returns(bytes32[] memory _boughtNotes){
@@ -288,6 +291,16 @@ contract NotesMarketContract {
     bytes32 salt = "S}7#%*SD30o7D";
     bytes32 accessToken = keccak256(abi.encodePacked(userAddr, IPFShash, salt));
     return accessToken;
+  }
+
+  function getOwnedNotes() canSellNotes(msg.sender) userExists(msg.sender) view external returns(bytes32[] memory _ownedNotes){
+    _ownedNotes = ownedNotes[msg.sender];
+    for(uint i=0; i < _ownedNotes.length; i++){
+      // exclude the leftover hashes in state array map ownedNotes
+      if(notesHashes[_ownedNotes[i]] == 0){
+        delete _ownedNotes[i];
+      }
+    }
   }
 
   

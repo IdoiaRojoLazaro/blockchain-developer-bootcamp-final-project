@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../actions/auth';
-import Dropdown from 'react-bootstrap/Dropdown';
 import { useHistory } from 'react-router';
-import { cropAccountString } from '../../utils/generalFunctions';
 
-export const Navbar = ({ searchParam }) => {
+import { logout } from '../../actions/auth';
+import { OpenModalAS } from '../../actions/modals';
+
+import { cropAccountString } from '../../utils/generalFunctions';
+import { LogoSmall } from './LogoSmall';
+import Dropdown from 'react-bootstrap/Dropdown';
+
+export const Navbar = () => {
   const dispatch = useDispatch();
   const { account, role, balance } = useSelector(state => state.auth);
-  const [search, setSearch] = useState(searchParam ? searchParam : '');
   const history = useHistory();
 
   const handleLogout = () => {
@@ -17,21 +20,15 @@ export const Navbar = ({ searchParam }) => {
     history.push(`/login`);
   };
 
-  const handleInputChange = event => {
-    setSearch(event.target.value);
-  };
-
-  const handleSubmitForm = e => {
-    e.preventDefault();
-    if (search.length > 0) {
-      history.push(`/search?search=${encodeURIComponent(search)}`);
-    }
-    // dispatch( searchUsers(search) );
+  const handleOpenApproveSellerModal = () => {
+    dispatch(OpenModalAS());
   };
 
   return (
     <div className="home__navbar">
-      <h1>The lazy corner</h1>
+      <h1>
+        <LogoSmall /> The lazy corner
+      </h1>
       {account && balance && (
         <Dropdown>
           <Dropdown.Toggle id="dropdown-basic" className="btn btn-account">
@@ -44,7 +41,9 @@ export const Navbar = ({ searchParam }) => {
             </div>
             <Dropdown.Divider />
             {role === 'admin' && (
-              <Dropdown.Item href="/users">Approve user</Dropdown.Item>
+              <Dropdown.Item href="" onClick={handleOpenApproveSellerModal}>
+                Approve user
+              </Dropdown.Item>
             )}
             <Dropdown.Item href="" onClick={handleLogout}>
               Logout

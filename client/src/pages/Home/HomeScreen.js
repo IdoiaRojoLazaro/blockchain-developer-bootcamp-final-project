@@ -1,30 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import { NoteNewModal } from '../Note/NoteNewModal';
-import { Layout } from '../../components/layout/Layout';
 import { useDispatch, useSelector } from 'react-redux';
+
 import { types } from '../../types/types';
 
-const Home = ({ contract, account }) => {
+import { Layout } from '../../components/layout/Layout';
+import { NoteNewModal } from '../Note/NoteNewModal';
+import { ApproveSellerModal } from '../Admin/ApproveSellerModal';
+
+import { Flashlight } from 'phosphor-react';
+
+export const HomeScreen = ({ contract, account }) => {
   const dispatch = useDispatch();
 
   const history = useHistory();
   const { role } = useSelector(state => state.auth);
   const [newNoteModal, setNewNoteModal] = useState(false);
   const { notes } = useSelector(state => state.notes);
+  const [show, setShow] = useState(false);
+  const approveSellerModalOpen = useSelector(state => state.modals);
+
+  useEffect(() => {
+    setShow(approveSellerModalOpen);
+  }, [approveSellerModalOpen]);
 
   useEffect(() => {
     if (contract !== null && account !== '') {
-      contract.methods
-        .getAllNotes()
-        .call({ from: account })
-        .then(res => {
-          console.log(res);
-          dispatch({
-            type: types.setNotes,
-            payload: res
-          });
-        });
+      // contract.methods
+      //   .getAllNotes()
+      //   .call({ from: account })
+      //   .then(res => {
+      //     console.log(res);
+      //     dispatch({
+      //       type: types.setNotes,
+      //       payload: res
+      //     });
+      //   });
     }
   }, []);
 
@@ -45,7 +56,7 @@ const Home = ({ contract, account }) => {
         )}
 
         <div className="notes__container">
-          {notes !== null &&
+          {notes !== null ? (
             notes.map((note, i) => (
               <div
                 className="note"
@@ -55,7 +66,14 @@ const Home = ({ contract, account }) => {
                 <p>{note['author']}</p>
                 <p className="price">{note['price']}eth</p>
               </div>
-            ))}
+            ))
+          ) : (
+            <div className="no-results">
+              <Flashlight size={48} />
+              <h3>No results found</h3>
+              <p>There aren't any note to buy.</p>
+            </div>
+          )}
 
           <NoteNewModal
             show={newNoteModal}
@@ -63,10 +81,16 @@ const Home = ({ contract, account }) => {
             contract={contract}
             account={account}
           />
+          {role === 'admin' && (
+            <ApproveSellerModal
+              show={show}
+              setShow={setShow}
+              contract={contract}
+              account={account}
+            />
+          )}
         </div>
       </div>
     </Layout>
   );
 };
-
-export default Home;

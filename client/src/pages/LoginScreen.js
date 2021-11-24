@@ -1,14 +1,17 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { types } from '../types/types';
 import { useHistory } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { useToasts } from 'react-toast-notifications';
+import { types } from '../types/types';
 import { cropAccountString } from '../utils/generalFunctions';
-import { Spinner } from 'phosphor-react';
 import { Title } from '../components/shared/Title';
+import { LogoBig } from '../components/shared/LogoBig';
+import { Spinner } from 'phosphor-react';
 
 export const LoginScreen = ({ contract, account, balance }) => {
   const dispatch = useDispatch();
   const history = useHistory();
+  const { addToast } = useToasts();
   const { checking } = useSelector(state => state.auth);
 
   const addNewUser = async noteOwner => {
@@ -20,19 +23,24 @@ export const LoginScreen = ({ contract, account, balance }) => {
       // const role = res._isAdmin ? 'admin' : res._isSeller ? 'seller' : 'buyer';
       const role = res.noteOwner ? 'seller' : 'buyer';
       if (res.status == true && res.events.UserCreated) {
-        alert('you have been successfully registered');
-        localStorage.setItem('isAuthenticated', true);
-        dispatch({
-          type: types.authLogin,
-          payload: {
-            account: account,
-            balance: balance,
-            isAuthenticated: true,
-            role: role,
-            uid: 1
-          }
+        addToast('You have been successfully registered', {
+          appearance: 'success',
+          autoDismiss: true
         });
-        history.push('/');
+        setTimeout(() => {
+          localStorage.setItem('isAuthenticated', true);
+          dispatch({
+            type: types.authLogin,
+            payload: {
+              account: account,
+              balance: balance,
+              isAuthenticated: true,
+              role: role,
+              uid: 1
+            }
+          });
+          history.push('/');
+        }, 500);
       }
     });
     // console.log(response);
@@ -93,6 +101,7 @@ export const LoginScreen = ({ contract, account, balance }) => {
         )}
       </div>
       <div>
+        <LogoBig />
         <Title />
         <p>
           You must provide a <b>metamask</b> account to enter the market
