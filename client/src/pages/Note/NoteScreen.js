@@ -14,7 +14,8 @@ export const NoteScreen = ({ contract, account }) => {
   const handleBuy = (e, noteHash) => {
     e.preventDefault();
     let response = contract.methods.buyNote(noteHash).send({
-      from: account
+      from: account,
+      value: parseInt(balance)
     });
     response.then(txn => {
       console.log('Note bought: ', txn);

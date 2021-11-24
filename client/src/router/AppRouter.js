@@ -27,7 +27,10 @@ export const AppRouter = () => {
   const [account, setAccount] = useState('');
   const [balance, setBalance] = useState('');
 
-  const refreshPage = () => window.location.reload();
+  const refreshPage = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
 
   const { checking, status, uid } = useSelector(state => state.auth);
 
@@ -37,9 +40,11 @@ export const AppRouter = () => {
 
   useEffect(() => {
     async function connectToWeb3() {
+      console.log('jolines');
       await web3()
         .then(web3 => {
           web3.eth.getAccounts().then(accounts => {
+            console.log(accounts);
             setAccount(accounts[0]);
             web3.eth.getBalance(accounts[0]).then(balanceValue => {
               let balanceFormat = utils.formatEther(balanceValue);
@@ -69,36 +74,33 @@ export const AppRouter = () => {
   };
 
   const getUser = async (account, contract, balance) => {
-    if (
-      isAuthenticated &&
-      contract !== null &&
-      account !== null &&
-      balance !== null
-    ) {
-      contract.methods
-        .getUser()
-        .call({ from: account })
-        .then(res => {
-          const role = res._isAdmin
-            ? 'admin'
-            : res._isSeller
-            ? 'seller'
-            : 'buyer';
+    if (isAuthenticated) {
+      if (contract !== null && account !== null && balance !== null) {
+        contract.methods
+          .getUser()
+          .call({ from: account })
+          .then(res => {
+            const role = res._isAdmin
+              ? 'admin'
+              : res._isSeller
+              ? 'seller'
+              : 'buyer';
 
-          dispatch({
-            type: types.authLogin,
-            payload: {
-              account: account,
-              balance: balance,
-              role: role,
-              uid: 1
-            }
+            dispatch({
+              type: types.authLogin,
+              payload: {
+                account: account,
+                balance: balance,
+                role: role,
+                uid: 1
+              }
+            });
           });
-        });
-      // dispatch({
-      //   type: types.authFinishLoading
-      // });
-      //setIsLoading(false);
+      }
+    } else {
+      dispatch({
+        type: types.authFinishLoading
+      });
     }
   };
 

@@ -20,7 +20,9 @@ export const Navbar = () => {
     history.push(`/login`);
   };
 
-  const handleOpenApproveSellerModal = () => {
+  const handleOpenApproveSellerModal = e => {
+    e.preventDefault();
+    console.log('coño');
     dispatch(OpenModalAS());
   };
 

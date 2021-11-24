@@ -18,24 +18,26 @@ export const HomeScreen = ({ contract, account }) => {
   const [newNoteModal, setNewNoteModal] = useState(false);
   const { notes } = useSelector(state => state.notes);
   const [show, setShow] = useState(false);
-  const approveSellerModalOpen = useSelector(state => state.modals);
+  const { approveSellerModalOpen } = useSelector(state => state.modals);
 
   useEffect(() => {
-    setShow(approveSellerModalOpen);
+    if (approveSellerModalOpen) {
+      setShow(approveSellerModalOpen);
+    }
   }, [approveSellerModalOpen]);
 
   useEffect(() => {
     if (contract !== null && account !== '') {
-      // contract.methods
-      //   .getAllNotes()
-      //   .call({ from: account })
-      //   .then(res => {
-      //     console.log(res);
-      //     dispatch({
-      //       type: types.setNotes,
-      //       payload: res
-      //     });
-      //   });
+      contract.methods
+        .getAllNotes()
+        .call({ from: account })
+        .then(res => {
+          console.log(res);
+          dispatch({
+            type: types.setNotes,
+            payload: res
+          });
+        });
     }
   }, []);
 

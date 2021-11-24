@@ -162,7 +162,7 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
             />
           </div>
           <div className="form-group">
-            <input type="file" name="data" onChange={retrieveFile} />
+            <input type="file" name="data" required onChange={retrieveFile} />
           </div>
         </div>
 
