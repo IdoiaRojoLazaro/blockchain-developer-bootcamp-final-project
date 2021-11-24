@@ -22,7 +22,6 @@ export const Navbar = () => {
 
   const handleOpenApproveSellerModal = e => {
     e.preventDefault();
-    console.log('coño');
     dispatch(OpenModalAS());
   };
 

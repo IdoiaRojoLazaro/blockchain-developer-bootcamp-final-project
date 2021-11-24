@@ -27,17 +27,19 @@ export const HomeScreen = ({ contract, account }) => {
   }, [approveSellerModalOpen]);
 
   useEffect(() => {
-    if (contract !== null && account !== '') {
-      contract.methods
-        .getAllNotes()
-        .call({ from: account })
-        .then(res => {
-          console.log(res);
-          dispatch({
-            type: types.setNotes,
-            payload: res
+    if (role !== 'admin') {
+      if (contract !== null && account !== '') {
+        contract.methods
+          .getAllNotes()
+          .call({ from: account })
+          .then(res => {
+            console.log(res);
+            dispatch({
+              type: types.setNotes,
+              payload: res
+            });
           });
-        });
+      }
     }
   }, []);
 

@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router';
+import { useParams, useHistory } from 'react-router';
 import { useToasts } from 'react-toast-notifications';
 import { Layout } from '../../components/layout/Layout';
 
 export const NoteScreen = ({ contract, account }) => {
   const { id } = useParams();
+  const history = useHistory();
   const [note, setNote] = useState(null);
   const { role, balance } = useSelector(state => state.auth);
   const { notes } = useSelector(state => state.notes);
   const { addToast } = useToasts();
+
+  useEffect(() => {
+    if (notes === null) {
+      history.push('/');
+    }
+  }, []);
 
   const handleBuy = (e, noteHash) => {
     e.preventDefault();

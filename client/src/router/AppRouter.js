@@ -40,7 +40,6 @@ export const AppRouter = () => {
 
   useEffect(() => {
     async function connectToWeb3() {
-      console.log('jolines');
       await web3()
         .then(web3 => {
           web3.eth.getAccounts().then(accounts => {
@@ -57,7 +56,7 @@ export const AppRouter = () => {
           });
         })
         .catch(e => {
-          console.log('problemitas');
+          console.log('No web3 injected');
 
           dispatch({
             type: types.authNoWeb3Injected
