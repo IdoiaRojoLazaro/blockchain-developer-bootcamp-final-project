@@ -1,22 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
-import { useDispatch, useSelector } from 'react-redux';
-
-import { types } from '../../types/types';
+import { useSelector } from 'react-redux';
 
 import { Layout } from '../../components/layout/Layout';
-import { NoteNewModal } from '../Note/NoteNewModal';
 import { ApproveSellerModal } from '../Admin/ApproveSellerModal';
 
-import { Flashlight } from 'phosphor-react';
+import axios from 'axios';
+import { HomeBuyer } from '../../components/home/HomeBuyer';
+import { HomeSeller } from '../../components/home/HomeSeller';
 
 export const HomeScreen = ({ contract, account }) => {
-  const dispatch = useDispatch();
-
-  const history = useHistory();
   const { role } = useSelector(state => state.auth);
-  const [newNoteModal, setNewNoteModal] = useState(false);
-  const { notes } = useSelector(state => state.notes);
+
   const [show, setShow] = useState(false);
   const { approveSellerModalOpen } = useSelector(state => state.modals);
 
@@ -27,73 +21,66 @@ export const HomeScreen = ({ contract, account }) => {
   }, [approveSellerModalOpen]);
 
   useEffect(() => {
-    if (role !== 'admin') {
-      if (contract !== null && account !== '') {
-        contract.methods
-          .getAllNotes()
-          .call({ from: account })
-          .then(res => {
-            console.log(res);
-            dispatch({
-              type: types.setNotes,
-              payload: res
-            });
-          });
-      }
-    }
+    //let eventsPast = contract.events.getPastEvents('UserCreated');
+    // let events = contract.events.allEvents();
+    // console.log(events);
+    console.log('me he suscrito??');
+    const events = contract.events.allEvents({ address: account }); // get all events
+    events.on('connected', function (subId) {
+      console.log(subId);
+    });
+    events.on('data', function (event) {
+      console.log(event);
+    });
+    console.log('me he suscripto al pasado??');
+    contract.events
+      .allEvents({ fromBlock: 'latest' })
+      .on('data', console.log)
+      .on('changed', console.log)
+      .on('error', console.log);
   }, []);
 
-  const handleClick = (e, id) => {
-    e.preventDefault();
-    history.push(`/note/${id}`);
+  const loadBoughtNotes = () => {
+    //dispatch(getMyPurchasedNotes(contract, account));
+
+    return axios
+      .get(
+        'https://ipfs.io/ipfs/QmaNxbQNrJdLzzd8CKRutBjMZ6GXRjvuPepLuNSsfdeJRJ'
+      )
+      .then(blob => {
+        console.log(blob);
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `FileName.pdf`);
+
+        // Append to html link element page
+        document.body.appendChild(link);
+
+        // Start download
+        link.click();
+
+        // Clean up and remove the link
+        link.parentNode.removeChild(link);
+      });
   };
 
   return (
     <Layout>
       <div>
+        {role == 'buyer' && <HomeBuyer contract={contract} account={account} />}
         {role === 'seller' && (
-          <p className="text-right">
-            <button className="btn" onClick={() => setNewNoteModal(true)}>
-              Add new note
-            </button>
-          </p>
+          <HomeSeller contract={contract} account={account} />
         )}
 
-        <div className="notes__container">
-          {notes !== null ? (
-            notes.map((note, i) => (
-              <div
-                className="note"
-                key={i}
-                onClick={e => handleClick(e, note['id'])}>
-                <p className="title">{note['title']}</p>
-                <p>{note['author']}</p>
-                <p className="price">{note['price']}eth</p>
-              </div>
-            ))
-          ) : (
-            <div className="no-results">
-              <Flashlight size={48} />
-              <h3>No results found</h3>
-              <p>There aren't any note to buy.</p>
-            </div>
-          )}
-
-          <NoteNewModal
-            show={newNoteModal}
-            setShow={setNewNoteModal}
+        {role === 'admin' && (
+          <ApproveSellerModal
+            show={show}
+            setShow={setShow}
             contract={contract}
             account={account}
           />
-          {role === 'admin' && (
-            <ApproveSellerModal
-              show={show}
-              setShow={setShow}
-              contract={contract}
-              account={account}
-            />
-          )}
-        </div>
+        )}
       </div>
     </Layout>
   );

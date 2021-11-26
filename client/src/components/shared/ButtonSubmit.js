@@ -1,11 +1,11 @@
 import React from 'react';
 import { Spinner } from 'phosphor-react';
 
-export default function ButtonSubmit({ loadingSubmit, text }) {
+export default function ButtonSubmit({ loadingSubmit, classNameBtn, text }) {
   return (
     <button
       type="submit"
-      className="btn btn-save btn-small"
+      className={`btn ${classNameBtn}`}
       disabled={loadingSubmit}>
       {loadingSubmit && (
         <Spinner weight="duotone" size={20}>

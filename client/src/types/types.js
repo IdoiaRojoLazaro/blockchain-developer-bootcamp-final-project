@@ -24,5 +24,8 @@ export const types = {
   login: '[auth] login',
 
   //notes
-  setNotes: '[notes] set notes'
+  setNotes: '[notes] set notes',
+  setNotesBought: '[notes] set notes bought',
+  notesLoading: '[notes] set notes loading',
+  setNoteActive: '[notes] set note active'
 };

@@ -9,16 +9,14 @@ import { PublicRoute } from './PublicRoute';
 import { PrivateRoute } from './PrivateRoute';
 
 import { LoginScreen } from '../pages/LoginScreen';
-
-import { UsersScreen } from '../pages/Users';
+import { NoteScreen } from '../pages/Note/NoteScreen';
+import { HomeScreen } from '../pages/Home/HomeScreen';
 
 import { types } from '../types/types';
 
 import { Title } from '../components/shared/Title';
 import { LogoBig } from '../components/shared/LogoBig';
 import { Spinner, WarningCircle, ArrowsClockwise } from 'phosphor-react';
-import { NoteScreen } from '../pages/Note/NoteScreen';
-import { HomeScreen } from '../pages/Home/HomeScreen';
 
 const { utils } = require('ethers');
 export const AppRouter = () => {
@@ -29,7 +27,10 @@ export const AppRouter = () => {
 
   const refreshPage = () => {
     localStorage.clear();
-    window.location.reload();
+    dispatch({
+      type: types.authFinishLoading
+    });
+    //window.location.reload();
   };
 
   const { checking, status, uid } = useSelector(state => state.auth);
@@ -73,33 +74,40 @@ export const AppRouter = () => {
   };
 
   const getUser = async (account, contract, balance) => {
-    if (isAuthenticated) {
-      if (contract !== null && account !== null && balance !== null) {
-        contract.methods
-          .getUser()
-          .call({ from: account })
-          .then(res => {
-            const role = res._isAdmin
-              ? 'admin'
-              : res._isSeller
-              ? 'seller'
-              : 'buyer';
+    if (
+      isAuthenticated &&
+      contract !== null &&
+      account !== null &&
+      balance !== null
+    ) {
+      contract.methods
+        .getUser()
+        .call({ from: account })
+        .then(res => {
+          console.log(res);
+          const role = res._isAdmin
+            ? 'admin'
+            : res._isSeller
+            ? 'seller'
+            : 'buyer';
 
-            dispatch({
-              type: types.authLogin,
-              payload: {
-                account: account,
-                balance: balance,
-                role: role,
-                uid: 1
-              }
-            });
+          dispatch({
+            type: types.authLogin,
+            payload: {
+              account: account,
+              balance: balance,
+              role: role,
+              uid: 1
+            }
           });
-      }
-    } else {
-      dispatch({
-        type: types.authFinishLoading
-      });
+        })
+        .catch(err => {
+          console.log(err);
+          localStorage.clear();
+          dispatch({
+            type: types.authFinishLoading
+          });
+        });
     }
   };
 
@@ -153,7 +161,7 @@ export const AppRouter = () => {
                 account={account}
                 balance={balance}
               />
-              <PrivateRoute
+              {/* <PrivateRoute
                 exact
                 path="/users"
                 component={UsersScreen}
@@ -161,7 +169,7 @@ export const AppRouter = () => {
                 contract={contract}
                 account={account}
                 balance={balance}
-              />
+              /> */}
               <PrivateRoute
                 exact
                 path="/note/:id"

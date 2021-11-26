@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
@@ -7,16 +7,19 @@ import { cropAccountString } from '../utils/generalFunctions';
 import { Title } from '../components/shared/Title';
 import { LogoBig } from '../components/shared/LogoBig';
 import { Spinner } from 'phosphor-react';
+import { Loading } from '../components/shared/Loading';
 
 export const LoginScreen = ({ contract, account, balance }) => {
   const dispatch = useDispatch();
   const history = useHistory();
   const { addToast } = useToasts();
   const { checking } = useSelector(state => state.auth);
+  const [loading, setLoading] = useState(false);
 
   const addNewUser = async noteOwner => {
     console.log(' ------- ------ -------- ------- ');
     console.log(account);
+    setLoading(true);
     let response = contract.methods.addUser(noteOwner).send({ from: account });
     response.then(res => {
       console.log(res);
@@ -27,20 +30,19 @@ export const LoginScreen = ({ contract, account, balance }) => {
           appearance: 'success',
           autoDismiss: true
         });
-        setTimeout(() => {
-          localStorage.setItem('isAuthenticated', true);
-          dispatch({
-            type: types.authLogin,
-            payload: {
-              account: account,
-              balance: balance,
-              isAuthenticated: true,
-              role: role,
-              uid: 1
-            }
-          });
-          history.push('/');
-        }, 500);
+
+        localStorage.setItem('isAuthenticated', true);
+        dispatch({
+          type: types.authLogin,
+          payload: {
+            account: account,
+            balance: balance,
+            isAuthenticated: true,
+            role: role,
+            uid: 1
+          }
+        });
+        history.push('/');
       }
     });
     // console.log(response);
@@ -127,13 +129,23 @@ export const LoginScreen = ({ contract, account, balance }) => {
           </div>
         )}
         <div className="login-actions flex">
-          {account && (
+          {loading ? (
+            <Loading />
+          ) : (
             <>
-              <button onClick={getUser}>I have an account</button>
-              <p>{'<<'}</p>
-              <button onClick={() => addNewUser(false)}>Login as Buyer</button>
-              <p>{'<<'}</p>
-              <button onClick={() => addNewUser(true)}>Login as Seller</button>
+              {account && (
+                <>
+                  <button onClick={getUser}>I have an account</button>
+                  <p>{'<<'}</p>
+                  <button onClick={() => addNewUser(false)}>
+                    Login as Buyer
+                  </button>
+                  <p>{'<<'}</p>
+                  <button onClick={() => addNewUser(true)}>
+                    Login as Seller
+                  </button>
+                </>
+              )}
             </>
           )}
         </div>

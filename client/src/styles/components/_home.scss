@@ -177,3 +177,24 @@
   width: 100%;
   padding: 50px 0 70px;
 }
+.header-tab-filters {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  margin-bottom: 30px;
+  h4 {
+    margin: 0 10px;
+    color: $secondary;
+    font-size: 12px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s;
+    cursor: pointer;
+    &:hover,
+    &.active {
+      border-bottom: 1px solid $primary;
+      color: $primary;
+      font-size: 16px;
+    }
+  }
+}

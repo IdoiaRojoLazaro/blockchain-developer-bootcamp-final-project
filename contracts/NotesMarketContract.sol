@@ -18,14 +18,11 @@ contract NotesMarketContract {
   bool private notesMarketIsClosed = false;
   address payable private admin;
 
-  constructor(uint8 minCommission){
+  constructor(){
     admin = payable(msg.sender);
-    notesMarketMinCommission = minCommission;
   }
 
   Note[] public notesArr;
-
-  uint8 private notesMarketMinCommission;
 
   // List of notes indexed by note hash -> numerical id
   mapping(bytes32 => uint) private notesHashes;
@@ -67,12 +64,10 @@ contract NotesMarketContract {
     address payable owner; 
     uint256 price; // price in tokens
     uint120 purchaseCount; // number of notes purchases
-      // percentage 0-100 commission to store
-      // 10000th (10% -> 1000) to keep 2dp
-    uint16 commission;
     uint8 exits;
     bool isApproved; // approved for sale
     string title;
+    string description;
     string author;
   }
 
@@ -132,12 +127,6 @@ contract NotesMarketContract {
     _;
   }
 
-  modifier validCommission(uint8 commission){
-    require(commission >=0 && commission <= 100, "Commission must be between 0 and 100");
-    require(commission >= notesMarketMinCommission, "Commission is set too low");
-    _;
-  }
-
   modifier sufficientFunds(uint price){
     require(price <= msg.value, "insufficient funds");
     _;
@@ -190,9 +179,10 @@ contract NotesMarketContract {
     emit UserRemoved("User successfully deleted");
   }
 
-  function getUser() isUserOrAdmin(msg.sender) view external returns(bool _authStatus, bool _isSeller, bool _isAdmin){
+  function getUser() isUserOrAdmin(msg.sender) view external returns(bool _authStatus, bool _isSeller, bool _isAdmin, bool _isSellerApproved){
       _authStatus = true;
       _isSeller = users[msg.sender].seller;
+      _isSellerApproved = users[msg.sender].isSellerApproved;
       if(msg.sender == admin) _isAdmin = true;
   }
 
@@ -209,20 +199,13 @@ contract NotesMarketContract {
 
   /* Notes */
 
-  function addNote(bytes32 _IPFShash, string memory _title, string memory _author, uint256 _price, uint8 _commission) 
-    userExists(msg.sender) canSellNotes(msg.sender) validCommission(_commission) external{
+  function addNote(bytes32 _IPFShash, string memory _title, string memory _description, string memory _author, uint256 _price) 
+    userExists(msg.sender) canSellNotes(msg.sender) external{
 
     bytes32 _noteHash = IPFSHashes[_IPFShash];
     uint _noteId = notesHashes[_noteHash];
     require(_noteId == 0, "Note already exists");
 
-    bool isApproved;
-
-    if(_commission >= notesMarketMinCommission){
-      isApproved = true;
-    }
-
-    uint commission = uint16(100).mul(_commission);
     uint newNoteId = notesArr.length + 1;
 
     _noteHash = keccak256(abi.encodePacked(newNoteId));
@@ -239,11 +222,11 @@ contract NotesMarketContract {
     note.owner = payable(msg.sender);
     note.price = _price;
     note.purchaseCount = 0;
-    note.commission = uint16(commission);
     note.exits = 1;
     note.title = _title;
+    note.description = _description;
     note.author = _author;
-    note.isApproved = isApproved;
+    note.isApproved = true;
 
     notesArr.push(note);
 
@@ -256,7 +239,6 @@ contract NotesMarketContract {
   }
 
   function getAllNotes() userExists(msg.sender) view external returns (Note[] memory){
-    
     Note[] memory notes;
     notes = notesArr;
     return notes;
@@ -268,7 +250,7 @@ contract NotesMarketContract {
     
     address payable seller = note.owner;
     
-    uint commissionFunds = note.price.mul(note.commission).div(10000);
+    uint commissionFunds = note.price.div(10000);
     uint paymentToSeller = note.price.sub(commissionFunds);
     bytes32 accessToken = generateAccessToken(msg.sender, note.IPFSHash);
     // store access token

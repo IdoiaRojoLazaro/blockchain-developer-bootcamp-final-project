@@ -127,3 +127,23 @@
     background-size: cover !important;
   }
 }
+
+.modal-show-note {
+  .pdf-icon {
+    margin: 20px auto 30px;
+    text-align: right;
+    svg {
+      border-radius: 50%;
+      padding: 5px;
+      background: #fff;
+      box-shadow: 0 1px 11px -1px rgba(0, 0, 0, 0.16);
+    }
+  }
+  h3 {
+    font-family: 'Cutive';
+  }
+  p {
+    margin: 10px 0;
+    text-align: left;
+  }
+}
