@@ -97,7 +97,8 @@ export const AppRouter = () => {
               account: account,
               balance: balance,
               role: role,
-              uid: 1
+              uid: 1,
+              approveToSell: res._isSellerApproved
             }
           });
         })

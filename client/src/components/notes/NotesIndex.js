@@ -5,19 +5,21 @@ import { Flashlight } from 'phosphor-react';
 import { NoteShowModal } from './NoteShowModal';
 import { types } from '../../types/types';
 
-export const NotesIndex = ({ notes, account, contract }) => {
+export const NotesIndex = ({ filterActive, notes, account, contract }) => {
   const { role } = useSelector(state => state.auth);
   const dispatch = useDispatch();
-
+  console.log(filterActive);
   const [showNoteModal, setShowNoteModal] = useState(false);
 
   const handleClick = (e, noteHash) => {
-    e.preventDefault();
-    setShowNoteModal(true);
-    dispatch({
-      type: types.setNoteActive,
-      payload: noteHash
-    });
+    if (filterActive !== 'bought') {
+      e.preventDefault();
+      setShowNoteModal(true);
+      dispatch({
+        type: types.setNoteActive,
+        payload: noteHash
+      });
+    }
   };
 
   return (
@@ -31,6 +33,16 @@ export const NotesIndex = ({ notes, account, contract }) => {
             <p className="title">{note['title']}</p>
             <p>{note['author']}</p>
             <p className="price">{note['price']}eth</p>
+            {filterActive === 'bought' && (
+              <a
+                href={`https://ipfs.io/ipfs/${getIpfsHashFromBytes32(
+                  note['IPFSHash']
+                )}`}
+                className="btn"
+                target="_blank">
+                Ver
+              </a>
+            )}
           </div>
         ))
       ) : (

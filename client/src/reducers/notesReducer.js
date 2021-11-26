@@ -12,21 +12,24 @@ export const notesReducer = (state = initialState, action) => {
   switch (action.type) {
     case types.notesLoading:
       return {
+        ...state,
         status: types.loading
       };
     case types.setNotes:
       return {
+        ...state,
         notes: action.payload,
         status: types.completed
       };
     case types.setNotesBought:
       return {
         ...state,
-        notesBought: action.payload,
+        notesBought: state.notes.filter(item =>
+          action.payload[0].includes(item.noteHash)
+        ),
         status: types.completed
       };
     case types.setNoteActive:
-      console.log(action.payload);
       return {
         ...state,
         noteActive: state.notes.filter(

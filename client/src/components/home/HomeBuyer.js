@@ -44,11 +44,15 @@ export const HomeBuyer = ({ account, contract }) => {
         </h4>
       </div>
       <div className="notes__container">
-        {status === types.loading ? (
+        {status === types.loading &&
+        notes !== null &&
+        notesBought &&
+        notesBought !== null ? (
           <Loading />
         ) : (
           <>
             <NotesIndex
+              filterActive={filterActive}
               notes={filterActive === '' ? notes : notesBought}
               contract={contract}
               account={account}

@@ -23,7 +23,6 @@ export const getMyPurchasedNotes = (contract, account) => {
       .getMyPurchasedNotes()
       .call({ from: account })
       .then(res => {
-        console.log(res);
         dispatch({
           type: types.setNotesBought,
           payload: res

@@ -1,3 +1,4 @@
+import { Alarm, Warning } from 'phosphor-react';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -8,15 +9,24 @@ import { Loading } from '../shared/Loading';
 
 export const HomeSeller = ({ contract, account }) => {
   const [newNoteModal, setNewNoteModal] = useState(false);
+  const { approveToSell } = useSelector(state => state.auth);
   const { notesUploaded, status } = useSelector(state => state.notes);
 
   return (
     <>
-      <p className="text-right">
-        <button className="btn" onClick={() => setNewNoteModal(true)}>
-          Add new note
-        </button>
-      </p>
+      {approveToSell ? (
+        <p className="text-right">
+          <button className="btn" onClick={() => setNewNoteModal(true)}>
+            Add new note
+          </button>
+        </p>
+      ) : (
+        <p className="warning">
+          <Warning size={18} />
+          You are not yet approved by the admin to sell
+        </p>
+      )}
+
       <div className="header-tab-filters">
         <h4 className="active">Notes created</h4>
       </div>
