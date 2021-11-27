@@ -18,10 +18,18 @@ button {
   border: 1px solid $c-blue-primary;
   font-family: 'Cutive';
   margin-top: 10px;
+  svg {
+    margin-right: 5px;
+  }
   &.btn-fill {
     min-height: 36px;
     background: $c-blue-primary;
     color: #fff;
+  }
+  &.btn-warning {
+    border-color: $c-error;
+    background: #fff;
+    color: $c-error;
   }
 }
 

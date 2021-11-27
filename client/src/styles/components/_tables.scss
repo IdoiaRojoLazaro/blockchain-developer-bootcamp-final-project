@@ -1,0 +1,100 @@
+.MuiTable-root {
+  .MuiSvgIcon-root {
+    font-size: 16px;
+  }
+  .MuiIconButton-root {
+    padding: 5px 10px;
+  }
+}
+
+.table__navlinks {
+  border-bottom: 1px solid #e3e8ee;
+  margin-top: 20px;
+  span {
+    cursor: pointer;
+    margin-right: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: $c-blue-light;
+    padding-bottom: 4px;
+    border-bottom: 1px solid transparent;
+    &:hover {
+      color: darken($color: $c-blue-light, $amount: 20);
+    }
+    &.active {
+      color: $c-blue-active;
+      border-bottom: 1px solid $c-blue-active;
+    }
+  }
+}
+.table__custom {
+  margin-top: 20px;
+  tr.deleted,
+  tr.inactive {
+    opacity: 0.4;
+  }
+  td {
+    font-weight: 500;
+    color: $c-blue-dark;
+    border-bottom: 1px solid #e3e8ee !important;
+    &.filtered {
+      color: $c-blue-active;
+    }
+  }
+  .table-head {
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+  .table-body {
+    td {
+      font-size: 14px;
+    }
+    tr:hover {
+      cursor: pointer;
+      td {
+        background: #f7fafc;
+      }
+    }
+  }
+  .table__checkbox {
+    background-color: rgb(255, 255, 255);
+    height: 14px;
+    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+      rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.12) 0px 1px 1px 0px,
+      rgba(60, 66, 87, 0.16) 0px 0px 0px 1px, rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+      rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(60, 66, 87, 0.08) 0px 2px 5px 0px;
+    min-width: 14px;
+    width: 14px;
+    border-radius: 4px;
+    position: relative;
+    transition: background-color 0.24s, box-shadow 0.24s;
+  }
+  .actions {
+    button {
+      padding: 0 5px;
+    }
+  }
+}
+.table__bottom {
+  p {
+    color: $c-blue-primary;
+    font-size: 14px;
+    font-weight: 400;
+    b {
+      font-weight: 500;
+    }
+  }
+}
+.table__no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 50px 0 70px;
+}
+.show-filters {
+  button {
+    margin-right: 15px;
+    color: $c-blue-active;
+  }
+}

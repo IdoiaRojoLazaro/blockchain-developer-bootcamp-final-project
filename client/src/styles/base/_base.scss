@@ -166,7 +166,7 @@ select {
   height: 50px;
 }
 .warning {
-  color: #af1414;
+  color: $c-error;
   margin: 20px auto;
   svg {
     margin-right: 10px;

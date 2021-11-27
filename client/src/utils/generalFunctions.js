@@ -22,9 +22,13 @@ const swalSuccess = title =>
     title: title
   });
 
+const swalError = err =>
+  Swal.fire('There was an error during transaction', err, 'error');
+
 export {
   cropAccountString,
   swalConnectionMetamask,
   swalWaitingTxn,
-  swalSuccess
+  swalSuccess,
+  swalError
 };

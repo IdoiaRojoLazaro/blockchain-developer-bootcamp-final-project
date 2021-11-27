@@ -1,26 +1,20 @@
 import { types } from '../types/types';
+import Swal from 'sweetalert2';
+import { swalError } from '../utils/generalFunctions';
 
 export const getNotes = (contract, account) => {
   return async dispatch => {
     dispatch({ type: types.notesLoading });
-    const resp = await contract.methods.getAllNotes().call({ from: account });
-    if (resp) {
-      console.log(resp);
-      dispatch({
-        type: types.setNotes,
-        payload: resp
-      });
-      return 'hola';
-    }
-    // .then(res => {
-    //   console.log(res);
-    //   dispatch({
-    //     type: types.setNotes,
-    //     payload: res
-    //   });
-    //   return 'hola';
-    // })
-    // .catch(error => false);
+    contract.methods
+      .getAllNotes()
+      .call({ from: account })
+      .then(res =>
+        dispatch({
+          type: types.setNotes,
+          payload: res
+        })
+      )
+      .catch(err => swalError());
   };
 };
 
@@ -36,7 +30,8 @@ export const getMyPurchasedNotes = (contract, account) => {
           type: types.setNotesBought,
           payload: res
         });
-      });
+      })
+      .catch(err => swalError());
   };
 };
 
@@ -47,14 +42,11 @@ export const getUploadedNotes = (contract, account) => {
       .getOwnedNotes()
       .call({ from: account })
       .then(res => {
-        console.log('çççççççç res');
-        console.log(res);
-        if (res.lenth[0] > 0) {
-          dispatch({
-            type: types.setUploadedNotes,
-            payload: res
-          });
-        }
-      });
+        dispatch({
+          type: types.setUploadedNotes,
+          payload: res
+        });
+      })
+      .catch(err => swalError());
   };
 };
