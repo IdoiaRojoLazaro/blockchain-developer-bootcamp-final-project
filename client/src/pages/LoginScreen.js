@@ -16,16 +16,15 @@ export const LoginScreen = ({ contract, account, balance }) => {
   const { checking } = useSelector(state => state.auth);
   const [loading, setLoading] = useState(false);
 
-  const addNewUser = async noteOwner => {
+  const addNewUser = async isSeller => {
     console.log(' ------- ------ -------- ------- ');
     console.log(account);
     setLoading(true);
-    let response = contract.methods.addUser(noteOwner).send({ from: account });
+    let response = contract.methods.addUser(isSeller).send({ from: account });
     response.then(res => {
       console.log(res);
       // const role = res._isAdmin ? 'admin' : res._isSeller ? 'seller' : 'buyer';
-      const role = res.noteOwner ? 'seller' : 'buyer';
-      if (res.status == true && res.events.UserCreated) {
+      if (res.status === true && res.events.UserCreated) {
         addToast('You have been successfully registered', {
           appearance: 'success',
           autoDismiss: true
@@ -38,26 +37,17 @@ export const LoginScreen = ({ contract, account, balance }) => {
             account: account,
             balance: balance,
             isAuthenticated: true,
-            role: role,
+            role: isSeller ? 'seller' : 'buyer',
             uid: 1
           }
         });
         history.push('/');
       }
     });
-    // console.log(response);
-    // console.log(state.contract);
-    // let usersCount = await state.contract.methods.usersCount().call();
-    // console.log(usersCount);
-    // if (response.status == true && response.events.UserCreated) {
-    //   alert('you have been successfully registered');
-    //   localStorage.setItem('isAuthenticated', true);
-    //   history.push('/');
-    // }
   };
 
   const getUser = () => {
-    let user = contract.methods
+    contract.methods
       .getUser()
       .call({ from: account })
       .then(res => {
@@ -79,10 +69,6 @@ export const LoginScreen = ({ contract, account, balance }) => {
             uid: 1
           }
         });
-
-        // if (res._authStatus) {
-        //   //history.push('/');
-        // }
       })
       .catch(err => {
         console.log(err);
@@ -138,11 +124,11 @@ export const LoginScreen = ({ contract, account, balance }) => {
                   <button onClick={getUser}>I have an account</button>
                   <p>{'<<'}</p>
                   <button onClick={() => addNewUser(false)}>
-                    Login as Buyer
+                    Sign up as Buyer
                   </button>
                   <p>{'<<'}</p>
                   <button onClick={() => addNewUser(true)}>
-                    Login as Seller
+                    Sign up as Seller
                   </button>
                 </>
               )}

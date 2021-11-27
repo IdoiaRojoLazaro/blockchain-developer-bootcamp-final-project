@@ -23,6 +23,7 @@ contract NotesMarketContract {
   }
 
   Note[] public notesArr;
+  User[] public usersArr;
 
   // List of notes indexed by note hash -> numerical id
   mapping(bytes32 => uint) private notesHashes;
@@ -32,7 +33,6 @@ contract NotesMarketContract {
 
   // List of users indexed by address
   mapping(address => User) private users;
-  uint public usersCount;
 
   // List of all note purchase tokens
   // for each note(noteHash), there is a collection of buyers' accessTokens(add -> accessToken)
@@ -72,7 +72,7 @@ contract NotesMarketContract {
   }
 
   // EVENTS
-  event UserCreated(string message, address userAddress, bool isNoteOwner);
+  event UserCreated(string message, address userAddress, bool isSeller);
   event UserRemoved(string message);
   event UserSellerApproved(string message);
 
@@ -128,18 +128,8 @@ contract NotesMarketContract {
   }
 
   modifier sufficientFunds(uint price){
-    require(price <= msg.value, "insufficient funds");
+    require(price <= msg.sender.balance, "insufficient funds");
     _;
-  }
-
-  modifier returnExcess(uint price) {
-    //refund them after pay for note
-    _;
-    //this is a silent failure if "there is no leftover to refund to buyer"
-    if(msg.value > price){ 
-      uint amountToRefund = msg.value - price;
-      payable(msg.sender).transfer(amountToRefund);
-    }        
   }
 
 
@@ -153,16 +143,20 @@ contract NotesMarketContract {
 
   /* Users */
   
-  function addUser(bool noteOwner) notesMarketIsOpen external{
+  function addUser(bool isSeller) notesMarketIsOpen external{
     require(users[msg.sender].exits == 0, "User already registered");
 
-    bool isSellerApproved = false;
-    uint8 exists = 1;
+    User memory user;
 
-    users[msg.sender] = User(msg.sender, noteOwner, isSellerApproved, exists);
-    usersCount ++;
+    user.userAddr = msg.sender;
+    user.seller = isSeller;
+    user.isSellerApproved = false; // Is approved to sell
+    user.exits = 1;
+  
+    users[msg.sender] = user;
+    usersArr.push(user);
 
-    emit UserCreated("User successfully created", msg.sender, noteOwner);
+    emit UserCreated("User successfully created", msg.sender, isSeller);
   }
 
   function removeUser() userExists(msg.sender) external{
@@ -197,6 +191,12 @@ contract NotesMarketContract {
     }
   }
 
+  function getAllUsers() isAdmin(msg.sender) view external returns (User[] memory){
+    User[] memory _users;
+    _users = usersArr;
+    return _users;
+  }
+
   /* Notes */
 
   function addNote(bytes32 _IPFShash, string memory _title, string memory _description, string memory _author, uint256 _price) 
@@ -220,7 +220,7 @@ contract NotesMarketContract {
     note.IPFSHash = _IPFShash;
     note.id = newNoteId;
     note.owner = payable(msg.sender);
-    note.price = _price;
+    note.price = _price; // wei
     note.purchaseCount = 0;
     note.exits = 1;
     note.title = _title;
@@ -239,27 +239,29 @@ contract NotesMarketContract {
   }
 
   function getAllNotes() userExists(msg.sender) view external returns (Note[] memory){
-    Note[] memory notes;
-    notes = notesArr;
-    return notes;
+    Note[] memory _notes;
+    _notes = notesArr;
+    return _notes;
   }
 
-  function buyNote(bytes32 noteHash) notesMarketIsOpen userExists(msg.sender) doesNoteExist(noteHash) sufficientFunds(notesArr[notesHashes[noteHash] - 1].price) returnExcess(notesArr[notesHashes[noteHash] - 1].price) payable external {
+  function buyNote(bytes32 noteHash) notesMarketIsOpen userExists(msg.sender) doesNoteExist(noteHash) sufficientFunds(notesArr[notesHashes[noteHash] - 1].price) payable external {
     uint noteId = notesHashes[noteHash];
     Note memory note = notesArr[noteId - 1];
     
     address payable seller = note.owner;
     
-    uint commissionFunds = note.price.div(10000);
+    uint commissionFunds = note.price.div(100);
     uint paymentToSeller = note.price.sub(commissionFunds);
-    bytes32 accessToken = generateAccessToken(msg.sender, note.IPFSHash);
+    //bytes32 accessToken = generateAccessToken(msg.sender, note.IPFSHash);
     // store access token
-    purchaseTokens[noteHash][msg.sender] = accessToken;
+    //purchaseTokens[noteHash][msg.sender] = accessToken;
     // keep note purchase
     boughtNotes[msg.sender].push(noteHash);
+    note.purchaseCount ++;
+    notesArr[noteId - 1].purchaseCount = note.purchaseCount;
 
     seller.transfer(paymentToSeller);
-    admin.transfer(commissionFunds);        
+    admin.transfer(commissionFunds);
     
     emit NoteBought("note bought", noteHash, msg.sender, seller);
 

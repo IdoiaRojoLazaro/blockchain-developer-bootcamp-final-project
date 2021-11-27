@@ -29,6 +29,12 @@ export const notesReducer = (state = initialState, action) => {
         ),
         status: types.completed
       };
+    case types.setUploadedNotes:
+      return {
+        ...state,
+        notesUploaded: action.payload,
+        status: types.completed
+      };
     case types.setNoteActive:
       return {
         ...state,

@@ -1,8 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from 'react';
 import { useToasts } from 'react-toast-notifications';
-
-import { CloseModalAS } from '../../actions/modals';
 
 import Modal from 'react-modal';
 import ButtonSubmit from '../../components/shared/ButtonSubmit';
@@ -20,7 +17,6 @@ const customStyles = {
 Modal.setAppElement('#root');
 
 export const ApproveSellerModal = ({ show, setShow, contract, account }) => {
-  const dispatch = useDispatch();
   const { addToast } = useToasts();
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [accountSeller, setAccountSeller] = useState('');
@@ -47,10 +43,8 @@ export const ApproveSellerModal = ({ show, setShow, contract, account }) => {
             appearance: 'success',
             autoDismiss: true
           });
-          setTimeout(() => {
-            setLoadingSubmit(false);
-            closeModal();
-          }, 1000);
+          setLoadingSubmit(false);
+          closeModal();
         }
       })
       .catch(err => {

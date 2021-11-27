@@ -3,10 +3,9 @@ import { useSelector } from 'react-redux';
 
 import { Layout } from '../../components/layout/Layout';
 import { ApproveSellerModal } from '../Admin/ApproveSellerModal';
-
-import axios from 'axios';
 import { HomeBuyer } from '../../components/home/HomeBuyer';
 import { HomeSeller } from '../../components/home/HomeSeller';
+import { HomeAdmin } from '../../components/home/HomeAdmin';
 
 export const HomeScreen = ({ contract, account }) => {
   const { role } = useSelector(state => state.auth);
@@ -32,54 +31,52 @@ export const HomeScreen = ({ contract, account }) => {
     events.on('data', function (event) {
       console.log(event);
     });
-    console.log('me he suscripto al pasado??');
+    console.log('me he suscrito al pasado??');
     contract.events
       .allEvents({ fromBlock: 'latest' })
       .on('data', console.log)
       .on('changed', console.log)
       .on('error', console.log);
+
+    // var options = {
+    //   fromBlock: 0,
+    //   address: web3.eth.defaultAccount,
+    //   topics: [
+    //     '0x0000000000000000000000000000000000000000000000000000000000000000',
+    //     null,
+    //     null
+    //   ]
+    // };
+    // web3.eth
+    //   .subscribe('logs', options, function (error, result) {
+    //     if (!error) console.log(result);
+    //   })
+    //   .on('data', function (log) {
+    //     console.log(log);
+    //   })
+    //   .on('changed', function (log) {});
   }, []);
-
-  const loadBoughtNotes = () => {
-    //dispatch(getMyPurchasedNotes(contract, account));
-
-    return axios
-      .get(
-        'https://ipfs.io/ipfs/QmaNxbQNrJdLzzd8CKRutBjMZ6GXRjvuPepLuNSsfdeJRJ'
-      )
-      .then(blob => {
-        console.log(blob);
-        const url = window.URL.createObjectURL(new Blob([blob]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `FileName.pdf`);
-
-        // Append to html link element page
-        document.body.appendChild(link);
-
-        // Start download
-        link.click();
-
-        // Clean up and remove the link
-        link.parentNode.removeChild(link);
-      });
-  };
 
   return (
     <Layout>
       <div>
-        {role == 'buyer' && <HomeBuyer contract={contract} account={account} />}
+        {role === 'buyer' && (
+          <HomeBuyer contract={contract} account={account} />
+        )}
         {role === 'seller' && (
           <HomeSeller contract={contract} account={account} />
         )}
 
         {role === 'admin' && (
-          <ApproveSellerModal
-            show={show}
-            setShow={setShow}
-            contract={contract}
-            account={account}
-          />
+          <>
+            <HomeAdmin contract={contract} account={account} />
+            <ApproveSellerModal
+              show={show}
+              setShow={setShow}
+              contract={contract}
+              account={account}
+            />
+          </>
         )}
       </div>
     </Layout>

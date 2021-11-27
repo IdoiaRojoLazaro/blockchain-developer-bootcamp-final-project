@@ -9,7 +9,6 @@ import { PublicRoute } from './PublicRoute';
 import { PrivateRoute } from './PrivateRoute';
 
 import { LoginScreen } from '../pages/LoginScreen';
-import { NoteScreen } from '../pages/Note/NoteScreen';
 import { HomeScreen } from '../pages/Home/HomeScreen';
 
 import { types } from '../types/types';
@@ -18,7 +17,6 @@ import { Title } from '../components/shared/Title';
 import { LogoBig } from '../components/shared/LogoBig';
 import { Spinner, WarningCircle, ArrowsClockwise } from 'phosphor-react';
 
-const { utils } = require('ethers');
 export const AppRouter = () => {
   const dispatch = useDispatch();
   const [contract, setContract] = useState(null);
@@ -30,7 +28,6 @@ export const AppRouter = () => {
     dispatch({
       type: types.authFinishLoading
     });
-    //window.location.reload();
   };
 
   const { checking, status, uid } = useSelector(state => state.auth);
@@ -47,7 +44,8 @@ export const AppRouter = () => {
             console.log(accounts);
             setAccount(accounts[0]);
             web3.eth.getBalance(accounts[0]).then(balanceValue => {
-              let balanceFormat = utils.formatEther(balanceValue);
+              //let balanceFormat = utils.formatEther(balanceValue);
+              let balanceFormat = balanceValue;
               setBalance(balanceFormat);
               getContract(accounts[0], balanceFormat);
             });
@@ -162,31 +160,6 @@ export const AppRouter = () => {
                 account={account}
                 balance={balance}
               />
-              {/* <PrivateRoute
-                exact
-                path="/users"
-                component={UsersScreen}
-                isAuthenticated={!!uid}
-                contract={contract}
-                account={account}
-                balance={balance}
-              /> */}
-              <PrivateRoute
-                exact
-                path="/note/:id"
-                component={NoteScreen}
-                isAuthenticated={!!uid}
-                contract={contract}
-                account={account}
-                balance={balance}
-              />
-              {/* <PublicRoute
-              exact
-              path="/note/:id"
-              component={Note}
-              state={state}
-            />
-            <PublicRoute exact path="/note_new" component={NewNoteScreen} /> */}
               <Redirect to={'/'} />
             </Switch>
           </div>

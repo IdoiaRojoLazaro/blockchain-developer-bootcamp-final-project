@@ -8,6 +8,7 @@ import { useToasts } from 'react-toast-notifications';
 import Swal from 'sweetalert2';
 import { getNotes } from '../../actions/notes';
 import { useDispatch } from 'react-redux';
+import { useFormatPrice } from '../../hooks/useFormatBalance';
 
 const customStyles = {
   content: {
@@ -58,7 +59,7 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
 
       let IPFShash = getBytes32FromIpfsHash(res);
       let response = contract.methods
-        .addNote(IPFShash, title, description, author, price)
+        .addNote(IPFShash, title, description, author, useFormatPrice(price))
         .send({ from: account });
       response
         .then(txn => {
@@ -159,7 +160,7 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
               name="price"
               onChange={handleInputChange}
               required
-              type="text"
+              type="number"
               value={price}
             />
           </div>

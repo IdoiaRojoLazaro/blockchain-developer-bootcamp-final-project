@@ -26,6 +26,7 @@ export const types = {
   //notes
   setNotes: '[notes] set notes',
   setNotesBought: '[notes] set notes bought',
+  setUploadedNotes: '[notes] set uploaded notes',
   notesLoading: '[notes] set notes loading',
   setNoteActive: '[notes] set note active'
 };

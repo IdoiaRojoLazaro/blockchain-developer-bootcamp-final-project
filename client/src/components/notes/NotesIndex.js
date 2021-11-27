@@ -8,7 +8,6 @@ import { types } from '../../types/types';
 export const NotesIndex = ({ filterActive, notes, account, contract }) => {
   const { role } = useSelector(state => state.auth);
   const dispatch = useDispatch();
-  console.log(filterActive);
   const [showNoteModal, setShowNoteModal] = useState(false);
 
   const handleClick = (e, noteHash) => {
@@ -27,7 +26,7 @@ export const NotesIndex = ({ filterActive, notes, account, contract }) => {
       {notes !== null ? (
         notes.map((note, i) => (
           <div
-            className="note"
+            className={`note ${filterActive === 'bought' ? 'bought' : ''}`}
             key={i}
             onClick={e => handleClick(e, note['noteHash'])}>
             <p className="title">{note['title']}</p>
@@ -39,8 +38,9 @@ export const NotesIndex = ({ filterActive, notes, account, contract }) => {
                   note['IPFSHash']
                 )}`}
                 className="btn"
-                target="_blank">
-                Ver
+                target="_blank"
+                rel="noopener noreferrer">
+                See
               </a>
             )}
           </div>

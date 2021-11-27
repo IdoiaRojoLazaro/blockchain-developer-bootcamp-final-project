@@ -30,3 +30,18 @@ export const getMyPurchasedNotes = (contract, account) => {
       });
   };
 };
+
+export const getUploadedNotes = (contract, account) => {
+  return async dispatch => {
+    dispatch({ type: types.notesLoading });
+    contract.methods
+      .getOwnedNotes()
+      .call({ from: account })
+      .then(res => {
+        dispatch({
+          type: types.setUploadedNotes,
+          payload: res
+        });
+      });
+  };
+};

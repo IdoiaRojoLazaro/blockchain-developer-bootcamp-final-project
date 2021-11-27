@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
@@ -8,10 +8,13 @@ import { OpenModalAS } from '../../actions/modals';
 import { cropAccountString } from '../../utils/generalFunctions';
 import { LogoSmall } from './LogoSmall';
 import Dropdown from 'react-bootstrap/Dropdown';
+import { useFormatBalance } from '../../hooks/useFormatBalance';
 
 export const Navbar = () => {
   const dispatch = useDispatch();
   const { account, role, balance } = useSelector(state => state.auth);
+  const balanceFormat = useFormatBalance(balance);
+
   const history = useHistory();
 
   const handleLogout = () => {
@@ -30,14 +33,14 @@ export const Navbar = () => {
       <h1>
         <LogoSmall /> The lazy corner
       </h1>
-      {account && balance && (
+      {account && balance && balanceFormat && (
         <Dropdown>
           <Dropdown.Toggle id="dropdown-basic" className="btn btn-account">
             {cropAccountString(account)}
           </Dropdown.Toggle>
           <Dropdown.Menu>
             <div className="navbar__user-info">
-              <h3>{parseFloat(balance).toFixed(4)} ETH</h3>
+              <h3>{parseFloat(balanceFormat).toFixed(4)} ETH</h3>
               <p>{role}</p>
             </div>
             <Dropdown.Divider />

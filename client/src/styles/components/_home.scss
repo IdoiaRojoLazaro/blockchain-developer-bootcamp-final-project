@@ -5,16 +5,22 @@
 .note {
   box-shadow: 0 1px 11px -1px rgba(0, 0, 0, 0.16);
   width: 300px;
-  height: 150px;
+  height: 180px;
   background: #fff;
   border-radius: 10px;
   margin: 10px;
   display: flex;
-  align-items: start;
+  align-items: flex-start;
   justify-content: flex-end;
   flex-direction: column;
   position: relative;
   padding: 15px;
+  cursor: pointer;
+  &.bought {
+    background: url('/images/logo_big_opacity.png') center no-repeat;
+    background-size: contain;
+    cursor: auto;
+  }
   p {
     font-size: 14px;
     font-family: 'Cutive';
@@ -180,7 +186,7 @@
 .header-tab-filters {
   display: flex;
   align-items: center;
-  justify-content: start;
+  justify-content: flex-start;
   margin-bottom: 30px;
   h4 {
     margin: 0 10px;

@@ -13,10 +13,11 @@ button {
   font-size: 16px;
   font-weight: 500;
   line-height: 28px;
-  min-height: 44px;
+  min-height: 36px;
   transition: all 0.2s;
   border: 1px solid $c-blue-primary;
   font-family: 'Cutive';
+  margin-top: 10px;
   &.btn-fill {
     min-height: 36px;
     background: $c-blue-primary;

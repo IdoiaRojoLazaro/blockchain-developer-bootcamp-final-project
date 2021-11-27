@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Modal from 'react-modal';
 import { useSelector } from 'react-redux';
 import ButtonSubmit from '../shared/ButtonSubmit';
-import { getBytes32FromIpfsHash } from '../../utils/ipfsHashHelper';
 import { useToasts } from 'react-toast-notifications';
 import { FilePdf } from 'phosphor-react';
 import { Loading } from '../shared/Loading';
@@ -23,15 +22,22 @@ export const NoteShowModal = ({ show, setShow, contract, account }) => {
   const { addToast } = useToasts();
   const { noteActive } = useSelector(state => state.notes);
   const { balance } = useSelector(state => state.auth);
+
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   const closeModal = () => setShow(false);
+
   const handleSubmitForm = e => {
     e.preventDefault();
     setLoadingSubmit(true);
+    console.log('-------- ***** ** account ***** ---------');
+    console.log(account);
+    console.log('-------- ***** ** contract ***** ---------');
+    console.log(contract);
+    console.log(balance);
     let response = contract.methods.buyNote(noteActive.noteHash).send({
       from: account,
-      value: parseInt(balance)
+      value: noteActive.price
     });
     response
       .then(txn => {
