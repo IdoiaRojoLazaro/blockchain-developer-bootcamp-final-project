@@ -3,6 +3,11 @@ import { useToasts } from 'react-toast-notifications';
 
 import Modal from 'react-modal';
 import ButtonSubmit from '../../components/shared/ButtonSubmit';
+import {
+  swalConnectionMetamask,
+  swalWaitingTxn,
+  swalSuccess
+} from '../../utils/generalFunctions';
 
 const customStyles = {
   content: {
@@ -32,21 +37,34 @@ export const ApproveSellerModal = ({ show, setShow, contract, account }) => {
   const handleSubmitForm = e => {
     e.preventDefault();
     setLoadingSubmit(true);
+    closeModal();
+    swalConnectionMetamask();
     let response = contract.methods
       .approveSeller(accountSeller)
       .send({ from: account });
+    response.on('transactionHash', function (hash) {
+      console.log(' ----- transactionHash ------');
+      console.log(hash);
+      swalWaitingTxn();
+    });
+    response.on('confirmation', function (confirmationNumber, receipt) {
+      console.log(' ----- confirmationNumber, receipt ------');
+      console.log(confirmationNumber, receipt);
+      swalSuccess('Seller approved successfully');
+      setLoadingSubmit(false);
+    });
     response
-      .then(txn => {
-        console.log('txn seller approved: ', txn);
-        if (txn.status && txn.events.UserSellerApproved) {
-          addToast('Seller approved successfully', {
-            appearance: 'success',
-            autoDismiss: true
-          });
-          setLoadingSubmit(false);
-          closeModal();
-        }
-      })
+      // .then(txn => {
+      //   console.log('txn seller approved: ', txn);
+      //   if (txn.status && txn.events.UserSellerApproved) {
+      //     addToast('Seller approved successfully', {
+      //       appearance: 'success',
+      //       autoDismiss: true
+      //     });
+      //     setLoadingSubmit(false);
+      //     closeModal();
+      //   }
+      // })
       .catch(err => {
         setLoadingSubmit(false);
         addToast('There was an error', {

@@ -4,6 +4,7 @@ import { getIpfsHashFromBytes32 } from '../../utils/ipfsHashHelper';
 import { Flashlight } from 'phosphor-react';
 import { NoteShowModal } from './NoteShowModal';
 import { types } from '../../types/types';
+const { utils } = require('ethers');
 
 export const NotesIndex = ({ filterActive, notes, account, contract }) => {
   const { role } = useSelector(state => state.auth);
@@ -31,7 +32,7 @@ export const NotesIndex = ({ filterActive, notes, account, contract }) => {
             onClick={e => handleClick(e, note['noteHash'])}>
             <p className="title">{note['title']}</p>
             <p>{note['author']}</p>
-            <p className="price">{note['price']}eth</p>
+            <p className="price">{utils.formatEther(note['price'])}eth</p>
             {filterActive === 'bought' && (
               <a
                 href={`https://ipfs.io/ipfs/${getIpfsHashFromBytes32(

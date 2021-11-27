@@ -3,7 +3,11 @@ import { useHistory } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import { types } from '../types/types';
-import { cropAccountString } from '../utils/generalFunctions';
+import {
+  cropAccountString,
+  swalConnectionMetamask,
+  swalWaitingTxn
+} from '../utils/generalFunctions';
 import { Title } from '../components/shared/Title';
 import { LogoBig } from '../components/shared/LogoBig';
 import { Spinner } from 'phosphor-react';
@@ -21,6 +25,13 @@ export const LoginScreen = ({ contract, account, balance }) => {
     console.log(account);
     setLoading(true);
     let response = contract.methods.addUser(isSeller).send({ from: account });
+    swalConnectionMetamask();
+
+    response.on('transactionHash', function (hash) {
+      console.log(' ----- transactionHash ------');
+      console.log(hash);
+      swalWaitingTxn();
+    });
     response.then(res => {
       console.log(res);
       // const role = res._isAdmin ? 'admin' : res._isSeller ? 'seller' : 'buyer';

@@ -1,7 +1,7 @@
 import { Warning } from 'phosphor-react';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUploadedNotes } from '../../actions/notes';
+import { getNotes, getUploadedNotes } from '../../actions/notes';
 
 import { types } from '../../types/types';
 import { NoteNewModal } from '../notes/NoteNewModal';
@@ -12,13 +12,13 @@ export const HomeSeller = ({ contract, account }) => {
   const dispatch = useDispatch();
   const [newNoteModal, setNewNoteModal] = useState(false);
   const { approveToSell } = useSelector(state => state.auth);
-  const { notesUploaded, status } = useSelector(state => state.notes);
+  const { notes, notesUploaded, status } = useSelector(state => state.notes);
 
   useEffect(() => {
-    if (contract !== null && account !== '') {
+    if (notes !== null) {
       dispatch(getUploadedNotes(contract, account));
     }
-  }, []);
+  }, [notes]);
 
   return (
     <>

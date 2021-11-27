@@ -8,7 +8,8 @@ import { useToasts } from 'react-toast-notifications';
 import Swal from 'sweetalert2';
 import { getNotes } from '../../actions/notes';
 import { useDispatch } from 'react-redux';
-import { useFormatPrice } from '../../hooks/useFormatBalance';
+
+const { utils } = require('ethers');
 
 const customStyles = {
   content: {
@@ -54,12 +55,11 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
   const handleSubmitForm = e => {
     e.preventDefault();
     setLoadingSubmit(true);
-    uploadFilePinata().then(res => {
-      console.log(res);
 
+    uploadFilePinata().then(res => {
       let IPFShash = getBytes32FromIpfsHash(res);
       let response = contract.methods
-        .addNote(IPFShash, title, description, author, useFormatPrice(price))
+        .addNote(IPFShash, title, description, author, utils.parseEther(price))
         .send({ from: account });
       response
         .then(txn => {
@@ -89,8 +89,6 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
     const pinataSecretApiKey = process.env.REACT_APP_PINATA_SECRET_API_KEY;
     const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
     let formData = new FormData();
-    console.log('fileUploaded');
-    console.log(fileUploaded);
     formData.append('file', fileUploaded);
     const metadata = JSON.stringify({
       name: 'testname',
@@ -154,7 +152,9 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
             />
           </div>
           <div className="form-group">
-            <label>Price</label>
+            <label>
+              Price (wei)<span>{'1 WEI = 0.000000000000000001 ETHER'}</span>
+            </label>
             <input
               autoComplete="off"
               name="price"

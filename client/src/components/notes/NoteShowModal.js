@@ -21,7 +21,7 @@ Modal.setAppElement('#root');
 export const NoteShowModal = ({ show, setShow, contract, account }) => {
   const { addToast } = useToasts();
   const { noteActive } = useSelector(state => state.notes);
-  const { balance } = useSelector(state => state.auth);
+  const { balance, role } = useSelector(state => state.auth);
 
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
@@ -81,13 +81,15 @@ export const NoteShowModal = ({ show, setShow, contract, account }) => {
               <h3>{noteActive['author']}</h3>
               <p>{noteActive['description']}</p>
             </div>
-            <div className="modal__footer">
-              <ButtonSubmit
-                loadingSubmit={loadingSubmit}
-                text={'buy'}
-                classNameBtn="btn-fill"
-              />
-            </div>
+            {role === 'buyer' && (
+              <div className="modal__footer">
+                <ButtonSubmit
+                  loadingSubmit={loadingSubmit}
+                  text={'buy'}
+                  classNameBtn="btn-fill"
+                />
+              </div>
+            )}
           </>
         ) : (
           <Loading />
