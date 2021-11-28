@@ -23,11 +23,6 @@ export const Navbar = () => {
     history.push(`/login`);
   };
 
-  const handleOpenApproveSellerModal = e => {
-    e.preventDefault();
-    dispatch(OpenModalAS());
-  };
-
   return (
     <div className="home__navbar">
       <h1>
@@ -44,11 +39,6 @@ export const Navbar = () => {
               <p>{role}</p>
             </div>
             <Dropdown.Divider />
-            {role === 'admin' && (
-              <Dropdown.Item href="" onClick={handleOpenApproveSellerModal}>
-                Approve user
-              </Dropdown.Item>
-            )}
             <Dropdown.Item href="" onClick={handleLogout}>
               Logout
             </Dropdown.Item>

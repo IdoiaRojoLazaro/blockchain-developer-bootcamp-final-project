@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Layout } from '../../components/layout/Layout';
-import { ApproveSellerModal } from '../Admin/ApproveSellerModal';
 import { HomeBuyer } from '../../components/home/HomeBuyer';
 import { HomeSeller } from '../../components/home/HomeSeller';
 import { HomeAdmin } from '../../components/home/HomeAdmin';
@@ -13,13 +12,6 @@ export const HomeScreen = ({ contract, account }) => {
   const { role } = useSelector(state => state.auth);
 
   const [show, setShow] = useState(false);
-  const { approveSellerModalOpen } = useSelector(state => state.modals);
-
-  useEffect(() => {
-    if (approveSellerModalOpen) {
-      setShow(approveSellerModalOpen);
-    }
-  }, [approveSellerModalOpen]);
 
   useEffect(() => {
     if (contract !== null && account !== '' && role !== 'admin') {
@@ -40,12 +32,6 @@ export const HomeScreen = ({ contract, account }) => {
         {role === 'admin' && (
           <>
             <HomeAdmin contract={contract} account={account} />
-            <ApproveSellerModal
-              show={show}
-              setShow={setShow}
-              contract={contract}
-              account={account}
-            />
           </>
         )}
       </div>

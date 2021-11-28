@@ -1,45 +1,40 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { useToasts } from 'react-toast-notifications';
 import { types } from '../types/types';
-import {
-  cropAccountString,
-  swalConnectionMetamask,
-  swalWaitingTxn
-} from '../utils/generalFunctions';
+import { cropAccountString } from '../utils/generalFunctions';
 import { Title } from '../components/shared/Title';
 import { LogoBig } from '../components/shared/LogoBig';
 import { Spinner } from 'phosphor-react';
 import { Loading } from '../components/shared/Loading';
+import {
+  swalConnectionMetamask,
+  swalWaitingTxn,
+  swalSuccess,
+  swalError
+} from '../utils/swalFires';
 
 export const LoginScreen = ({ contract, account, balance }) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const { addToast } = useToasts();
   const { checking } = useSelector(state => state.auth);
   const [loading, setLoading] = useState(false);
 
   const addNewUser = async isSeller => {
-    console.log(' ------- ------ -------- ------- ');
-    console.log(account);
     setLoading(true);
     let response = contract.methods.addUser(isSeller).send({ from: account });
     swalConnectionMetamask();
-
+    response.on('error', function (error) {
+      swalError('You must accept the transaction on metamask to continue');
+    });
     response.on('transactionHash', function (hash) {
       console.log(' ----- transactionHash ------');
       console.log(hash);
       swalWaitingTxn();
     });
     response.then(res => {
-      console.log(res);
-      // const role = res._isAdmin ? 'admin' : res._isSeller ? 'seller' : 'buyer';
       if (res.status === true && res.events.UserCreated) {
-        addToast('You have been successfully registered', {
-          appearance: 'success',
-          autoDismiss: true
-        });
+        swalSuccess('You have been successfully registered');
 
         localStorage.setItem('isAuthenticated', true);
         dispatch({

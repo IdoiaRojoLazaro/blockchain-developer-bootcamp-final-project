@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
-import Modal from 'react-modal';
 import { useSelector } from 'react-redux';
+
+import {
+  swalConnectionMetamask,
+  swalWaitingTxn,
+  swalError
+} from '../../utils/swalFires';
+
+import Swal from 'sweetalert2';
+import Modal from 'react-modal';
 import ButtonSubmit from '../shared/ButtonSubmit';
-import { useToasts } from 'react-toast-notifications';
-import { FilePdf } from 'phosphor-react';
 import { Loading } from '../shared/Loading';
+import { FilePdf } from 'phosphor-react';
+import { useFormatBalance } from '../../hooks/useFormatBalance';
 
 const customStyles = {
   content: {
@@ -19,44 +27,56 @@ const customStyles = {
 Modal.setAppElement('#root');
 
 export const NoteShowModal = ({ show, setShow, contract, account }) => {
-  const { addToast } = useToasts();
   const { noteActive } = useSelector(state => state.notes);
   const { balance, role } = useSelector(state => state.auth);
 
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const balanceFormat = useFormatBalance(balance);
 
   const closeModal = () => setShow(false);
 
   const handleSubmitForm = e => {
     e.preventDefault();
-    setLoadingSubmit(true);
-    console.log('-------- ***** ** account ***** ---------');
-    console.log(account);
-    console.log('-------- ***** ** contract ***** ---------');
-    console.log(contract);
-    console.log(balance);
-    let response = contract.methods.buyNote(noteActive.noteHash).send({
-      from: account,
-      value: noteActive.price
-    });
-    response
-      .then(txn => {
-        console.log('Note bought: ', txn);
-        if (txn.status && txn.events.NoteBought) {
-          addToast('Note bought successfully', {
-            appearance: 'success',
-            autoDismiss: true
-          });
-        }
-      })
-      .catch(err => {
-        console.log(err);
-        addToast('There was an error during transaction', {
-          appearance: 'error',
-          autoDismiss: true
-        });
-        setLoadingSubmit(false);
+    if (balanceFormat < noteActive.price) {
+      swalError(
+        'Add some credit to your wallet and refresh the page',
+        'Insufficient funds to buy the note'
+      );
+    } else {
+      setLoadingSubmit(true);
+      let response = contract.methods.buyNote(noteActive.noteHash).send({
+        from: account,
+        value: noteActive.price
       });
+
+      swalConnectionMetamask();
+      response.on('error', function () {
+        swalError('You must accept the transaction on metamask to continue');
+      });
+      response.on('transactionHash', function () {
+        swalWaitingTxn();
+      });
+
+      response
+        .then(txn => {
+          console.log('Note bought: ', txn);
+          if (txn.status && txn.events.NoteBought) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Note bought successfully',
+              text: 'You can check it on the Notes Bought tab'
+            }).then(() => {
+              closeModal();
+              setLoadingSubmit(false);
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          swalError('There was an error during transaction');
+          setLoadingSubmit(false);
+        });
+    }
   };
 
   if (noteActive && noteActive !== null) {
@@ -80,6 +100,7 @@ export const NoteShowModal = ({ show, setShow, contract, account }) => {
               <h1>{noteActive['title']}</h1>
               <h3>{noteActive['author']}</h3>
               <p>{noteActive['description']}</p>
+              <p>Units purchased: {noteActive['purchaseCount']}</p>
             </div>
             {role === 'buyer' && (
               <div className="modal__footer">

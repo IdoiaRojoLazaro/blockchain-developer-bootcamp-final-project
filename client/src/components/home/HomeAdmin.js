@@ -6,9 +6,10 @@ import { types } from '../../types/types';
 import {
   swalConnectionMetamask,
   swalWaitingTxn,
-  swalSuccess
-} from '../../utils/generalFunctions';
+  swalError
+} from '../../utils/swalFires';
 import { Loading } from '../shared/Loading';
+import Swal from 'sweetalert2';
 
 export const HomeAdmin = ({ contract, account }) => {
   const dispatch = useDispatch();
@@ -21,23 +22,32 @@ export const HomeAdmin = ({ contract, account }) => {
     }
   }, []);
 
-  const handleApprove = accountSeller => {
+  const handleApprove = (e, accountSeller) => {
+    e.preventDefault();
+
     swalConnectionMetamask();
 
     let response = contract.methods
       .approveSeller(accountSeller)
       .send({ from: account });
-    response.on('transactionHash', function (hash) {
-      console.log(' ----- transactionHash ------');
-      console.log(hash);
+
+    response.on('error', function () {
+      swalError('You must accept the transaction on metamask to continue');
+    });
+    response.on('transactionHash', function () {
       swalWaitingTxn();
     });
-    response.on('confirmation', function (confirmationNumber, receipt) {
-      console.log(' ----- confirmationNumber, receipt ------');
-      console.log(confirmationNumber, receipt);
-      swalSuccess('Seller approved successfully');
+
+    response.then(res => {
+      if (res.status === true && res.events.UserSellerApproved) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Seller approved successfully'
+        }).then(() => dispatch(getUsers(contract, account)));
+      }
     });
   };
+
   return (
     <div>
       {status === types.loading ? (

@@ -71,7 +71,7 @@ contract('TheLazyCornerContract', function (accounts) {
   });
 
   it('Should revert if a buyer (not seller) tries to add a new note', async () => {
-    await instance.addUser(true, { from: buyer_1 });
+    await instance.addUser(false, { from: buyer_1 });
     await catchRevert(
       instance.addNote(
         noteOne.IPFShash,
@@ -84,10 +84,14 @@ contract('TheLazyCornerContract', function (accounts) {
     );
   });
 
+  it('Should revert if a admin tries to approve a buyer (not seller)', async () => {
+    await instance.addUser(false, { from: buyer_1 });
+    await catchRevert(instance.approveSeller(buyer_1, { from: admin }));
+  });
+
   it('Should revert when duplicate note IPFS is added', async () => {
     await instance.addUser(true, { from: seller_1 });
 
-    await instance.approveSeller(seller_1, { from: admin });
     await instance.addNote(
       noteOne.IPFShash,
       noteOne.title,
@@ -135,15 +139,34 @@ contract('TheLazyCornerContract', function (accounts) {
 
   it('Should return list of users registered', async () => {
     await instance.addUser(true, { from: seller_1 });
-    await instance.addUser(true, { from: buyer_1 });
+    await instance.addUser(false, { from: buyer_1 });
     await instance.addUser(true, { from: seller_2 });
-    await instance.addUser(true, { from: buyer_2 });
+    await instance.addUser(false, { from: buyer_2 });
 
+    await instance.approveSeller(seller_1, { from: admin });
+
+    //await instance.getAllUsers({ from: admin }).then((res) => console.log(res));
     let users = await instance.getAllUsers({ from: admin });
 
     assert.equal(users.length, 4, 'Users length must be 4');
+    assert.equal(users[3].id, 4, 'Users id must be incrementing');
+    assert.equal(
+      users[0].isSellerApproved,
+      true,
+      'Seller must be shown as approved'
+    );
+    assert.equal(
+      users[2].isSellerApproved,
+      false,
+      'Seller must be shown as not approved'
+    );
+    assert.equal(
+      users[1].seller,
+      false,
+      'Buyer must have seller attr as false'
+    );
 
-    // assert.equal(usersPage1.length, 3, 'Users length page 1 must be 3');
+    //assert.equal(usersPage1.length, 3, 'Users length page 1 must be 3');
 
     // let usersPage2 = await instance.getAllUsers(3, { from: admin });
     // assert.equal(usersPage2.length, 1, 'Users length page 2 must be 1');
@@ -173,15 +196,15 @@ contract('TheLazyCornerContract', function (accounts) {
     let buyer_1BalanceBefore = await web3.eth.getBalance(buyer_1);
     let adminBalanceBefore = await web3.eth.getBalance(admin);
     let seller_1BalanceBefore = await web3.eth.getBalance(seller_1);
-    console.log('----- **** ----');
-    console.log(newNote);
-    console.log(buyer_1BalanceBefore);
+    // console.log('----- **** ----');
+    // console.log(newNote);
+    // console.log(buyer_1BalanceBefore);
 
     let noteBought = await instance.buyNote(newNoteHash, {
       from: buyer_1,
       value: noteOne.price
     });
-    console.log(noteBought.logs);
+    //console.log(noteBought.logs);
     assert(
       noteBought.logs[0].event,
       'NoteBought',
@@ -203,7 +226,7 @@ contract('TheLazyCornerContract', function (accounts) {
     let purchasedNotes = await instance.getMyPurchasedNotes({ from: buyer_1 });
     let allNotes = await instance.getAllNotes({ from: seller_1 });
     //console.log('****************');
-    console.log(allNotes[0].purchaseCount);
+    //console.log(allNotes[0].purchaseCount);
     assert(purchasedNotes.length, 1, 'buyer purchased notes count must be 1');
     assert.equal(
       allNotes[0].purchaseCount,

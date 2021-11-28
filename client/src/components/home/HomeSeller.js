@@ -15,7 +15,7 @@ export const HomeSeller = ({ contract, account }) => {
   const { notes, notesUploaded, status } = useSelector(state => state.notes);
 
   useEffect(() => {
-    if (notes !== null) {
+    if (approveToSell && notes !== null && notes !== []) {
       dispatch(getUploadedNotes(contract, account));
     }
   }, [notes]);

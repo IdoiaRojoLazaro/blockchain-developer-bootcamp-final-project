@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-
-import Modal from 'react-modal';
-import ButtonSubmit from '../shared/ButtonSubmit';
-import { getBytes32FromIpfsHash } from '../../utils/ipfsHashHelper';
-import { useToasts } from 'react-toast-notifications';
-import Swal from 'sweetalert2';
-import { getNotes } from '../../actions/notes';
 import { useDispatch } from 'react-redux';
+
+import { getNotes } from '../../actions/notes';
+import { getBytes32FromIpfsHash } from '../../utils/ipfsHashHelper';
+import {
+  swalConnectionMetamask,
+  swalWaitingTxn,
+  swalError
+} from '../../utils/swalFires';
+
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import Modal from 'react-modal';
+
+import { useToasts } from 'react-toast-notifications';
+import ButtonSubmit from '../shared/ButtonSubmit';
+import { Warning } from 'phosphor-react';
 
 const { utils } = require('ethers');
 
@@ -58,27 +66,34 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
 
     uploadFilePinata().then(res => {
       let IPFShash = getBytes32FromIpfsHash(res);
+
+      swalConnectionMetamask();
       let response = contract.methods
         .addNote(IPFShash, title, description, author, utils.parseEther(price))
         .send({ from: account });
+
+      response.on('error', function () {
+        swalError('You must accept the transaction on metamask to continue');
+      });
+      response.on('transactionHash', function (hash) {
+        swalWaitingTxn();
+      });
+
       response
         .then(txn => {
           console.log('txn note added: ', txn);
           if (txn.status && txn.events.NoteAdded) {
-            addToast('The note has successfully uploaded', {
-              appearance: 'success',
-              autoDismiss: true
-            });
-            dispatch(getNotes(contract, account));
+            Swal.fire({
+              icon: 'success',
+              title: 'The note has successfully uploaded'
+            }).then(() => dispatch(getNotes(contract, account)));
+
             closeModal();
           }
         })
         .catch(err => {
           console.log(err);
-          addToast('There was an error', {
-            appearance: 'error',
-            autoDismiss: true
-          });
+          swalError('There was an error during transaction');
           closeModal();
         });
     });
@@ -152,9 +167,7 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
             />
           </div>
           <div className="form-group">
-            <label>
-              Price (wei)<span>{'1 WEI = 0.000000000000000001 ETHER'}</span>
-            </label>
+            <label>Price (eth)</label>
             <input
               autoComplete="off"
               name="price"
@@ -177,6 +190,10 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
               required
               defaultValue={description}></textarea>
           </div>
+          <p className="warning">
+            <Warning size={18} />
+            Commission is 10% of the price for the platform
+          </p>
         </div>
 
         <div className="modal__footer">

@@ -21,7 +21,6 @@ export const NotesIndex = ({ filterActive, notes, account, contract }) => {
       });
     }
   };
-
   return (
     <>
       {notes !== null ? (
@@ -33,6 +32,7 @@ export const NotesIndex = ({ filterActive, notes, account, contract }) => {
             <p className="title">{note['title']}</p>
             <p>{note['author']}</p>
             <p className="price">{utils.formatEther(note['price'])}eth</p>
+            <p className="purchase-count">Purchased: {note['purchaseCount']}</p>
             {filterActive === 'bought' && (
               <a
                 href={`https://ipfs.io/ipfs/${getIpfsHashFromBytes32(

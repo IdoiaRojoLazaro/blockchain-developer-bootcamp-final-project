@@ -1,6 +1,4 @@
 import { types } from '../types/types';
-import Swal from 'sweetalert2';
-import { swalError } from '../utils/generalFunctions';
 
 export const getNotes = (contract, account) => {
   return async dispatch => {
@@ -14,7 +12,7 @@ export const getNotes = (contract, account) => {
           payload: res
         })
       )
-      .catch(err => swalError());
+      .catch(err => console.log(err));
   };
 };
 
@@ -31,7 +29,7 @@ export const getMyPurchasedNotes = (contract, account) => {
           payload: res
         });
       })
-      .catch(err => swalError());
+      .catch(err => console.log(err));
   };
 };
 
@@ -47,6 +45,6 @@ export const getUploadedNotes = (contract, account) => {
           payload: res
         });
       })
-      .catch(err => swalError());
+      .catch(err => console.log(err));
   };
 };

@@ -31,25 +31,8 @@
   }
   .btn-account {
     cursor: default !important;
-  }
-  .navbar__icon {
-    background: none;
-    border: none;
-    color: $c-blue-light;
-    height: 100%;
-    padding: 0;
-    width: 16px;
-    margin: 0 8px;
-    border: 1px solid $c-blue-light;
-    min-height: unset;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    svg {
-      margin-bottom: 6px;
-    }
-    &:hover {
-      color: darken($color: $c-blue-light, $amount: 20);
+    &.dropdown-toggle {
+      cursor: pointer !important;
     }
   }
   #dropdown-basic.dropdown-toggle {

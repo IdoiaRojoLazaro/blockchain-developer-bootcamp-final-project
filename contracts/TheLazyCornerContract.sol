@@ -51,6 +51,7 @@ contract TheLazyCornerContract {
   // Buy -> All users can buy notes
   // Sell -> Just approved users can sell notes
   struct User{
+    uint id;
     address userAddr;
     bool seller; // Note owner
     bool isSellerApproved; // Is approved to sell
@@ -60,7 +61,7 @@ contract TheLazyCornerContract {
   struct Note{
     bytes32 noteHash; // note id hash
     bytes32 IPFSHash; // note ipfs reference
-    uint id; // id - 1 -> position of bote in dynamic array
+    uint id; // id - 1 -> position of note in dynamic array
     address payable owner; 
     uint256 price; // price in tokens
     uint120 purchaseCount; // number of notes purchases
@@ -159,7 +160,7 @@ contract TheLazyCornerContract {
     require(users[msg.sender].exits == 0, "User already registered");
 
     User memory user;
-
+    user.id = usersArr.length + 1;
     user.userAddr = msg.sender;
     user.seller = isSeller;
     user.isSellerApproved = false; // Is approved to sell
@@ -197,6 +198,7 @@ contract TheLazyCornerContract {
     if(users[userAddress].seller){
       User storage user = users[userAddress];
       user.isSellerApproved = true;
+      usersArr[user.id - 1].isSellerApproved = true;
       emit UserSellerApproved("User seller is approved for sell");
     }else{
       revert("User is not a seller");
