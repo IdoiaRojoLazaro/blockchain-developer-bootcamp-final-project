@@ -10,7 +10,6 @@
     "bootstrap": "^4.6.0",
     "ethers": "^5.5.1",
     "ipfs-http-client": "^54.0.0",
-    "node-sass": "4.14.1",
     "phosphor-react": "^1.3.1",
     "react": "^17.0.1",
     "react-bootstrap": "^1.5.2",
@@ -25,6 +24,8 @@
     "react-typewriter-effect": "^1.1.0",
     "redux": "^4.1.2",
     "redux-thunk": "^2.4.0",
+    "sass": "^1.43.5",
+    "sass-loader": "^12.3.0",
     "styled-components": "^5.2.3",
     "sweetalert2": "^11.1.10",
     "web3": "^1.6.0"

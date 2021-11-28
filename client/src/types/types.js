@@ -5,10 +5,6 @@ export const types = {
   completed: '[status] completed',
   failed: '[status] failed',
 
-  //modals
-  openModalAS: '[modals] open approve seller modal',
-  closeModalAS: '[modals] close approve seller modal',
-
   // auth
   authNoMetamaskInstalled: '[auth] authNoMetamaskInstalled',
   authNoWeb3Injected: '[auth] authNoWeb3Injected',

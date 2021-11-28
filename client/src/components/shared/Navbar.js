@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 
 import { logout } from '../../actions/auth';
-import { OpenModalAS } from '../../actions/modals';
 
 import { cropAccountString } from '../../utils/generalFunctions';
 import { LogoSmall } from './LogoSmall';
