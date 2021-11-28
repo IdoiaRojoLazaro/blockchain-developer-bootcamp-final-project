@@ -1,5 +1,5 @@
-var NotesMarketContract = artifacts.require('./NotesMarketContract.sol');
+var TheLazyCornerContract = artifacts.require('./TheLazyCornerContract.sol');
 
 module.exports = function (deployer) {
-  deployer.deploy(NotesMarketContract);
+  deployer.deploy(TheLazyCornerContract);
 };

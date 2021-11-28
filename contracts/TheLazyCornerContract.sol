@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
+pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-/// @title NotesMarketContract
-/// @author The name of the author
+/// @title The Lazy Corner Contract
+/// @author Idoia Rojo Lázaro
 /// @notice Explain to an end user what this does
 /// @dev Contract for selling and bying notes market
 
 /**
 @title 
  */
-contract NotesMarketContract {
+contract TheLazyCornerContract {
 
   using SafeMath for uint256;
-    using SafeMath for uint16;
 
-  bool private notesMarketIsClosed = false;
+  bool private theLazyCornerIsClosed = false;
   address payable private admin;
 
   constructor(){
@@ -88,8 +88,8 @@ contract NotesMarketContract {
     _;
   }
   
-  modifier notesMarketIsOpen(){
-    require(notesMarketIsClosed == false, "Notesmarket is closed by admin" );
+  modifier theLazyCornerIsOpen(){
+    require(theLazyCornerIsClosed == false, "Notesmarket is closed by admin" );
     _;
   }
 
@@ -128,22 +128,34 @@ contract NotesMarketContract {
   }
 
   modifier sufficientFunds(uint price){
-    require(price <= msg.sender.balance, "insufficient funds");
+    require(price <= msg.sender.balance, "Insufficient funds");
     _;
   }
 
+  modifier returnExcess(uint price) {
+    //refund them after pay for book
+    _;
+    //this is a silent failure if "there is no leftover to refund to buyer"
+      if(msg.value > price){ 
+        uint amountToRefund = msg.value - price;
+        // payable(msg.sender).transfer(amountToRefund);
+        
+        (bool success, ) = payable(msg.sender).call{value: amountToRefund}("");
+        require(success);
+      }        
+  }
 
   // FUNCTIONS
 
   /* NoteMarket */
 
-  function changeNotesMarketStatus() isAdmin(msg.sender) external{
-    notesMarketIsClosed = !notesMarketIsClosed;
+  function changeTheLazyCornerStatus() isAdmin(msg.sender) external{
+    theLazyCornerIsClosed = !theLazyCornerIsClosed;
   }
 
   /* Users */
   
-  function addUser(bool isSeller) notesMarketIsOpen external{
+  function addUser(bool isSeller) theLazyCornerIsOpen external{
     require(users[msg.sender].exits == 0, "User already registered");
 
     User memory user;
@@ -181,7 +193,7 @@ contract NotesMarketContract {
   }
 
 
-  function approveSeller(address userAddress) notesMarketIsOpen isAdmin(msg.sender) userExists(userAddress) external{
+  function approveSeller(address userAddress) theLazyCornerIsOpen isAdmin(msg.sender) userExists(userAddress) external{
     if(users[userAddress].seller){
       User storage user = users[userAddress];
       user.isSellerApproved = true;
@@ -191,8 +203,32 @@ contract NotesMarketContract {
     }
   }
 
-  function getAllUsers() isAdmin(msg.sender) view external returns (User[] memory){
-    User[] memory _users;
+  /** 
+    * @dev Admin fetches users using filters, max 50 results
+    * @return _users array of users
+    */
+  function getAllUsers() isAdmin(msg.sender) view external returns (User[] memory _users){
+    //require(_start <= usersArr.length, "No results for that page");
+    
+    // uint perPage = 2; //per page
+    // uint maxIterations = perPage;
+    // address[] memory _users;
+
+    // _usersAddress = new address[](1);
+
+    // // if(_start.add(perPage) <  usersArr.length){
+    // //   maxIterations = usersArr.length - _start.add(perPage);
+    // // }
+
+    // // for(uint i=0; i < maxIterations; i++) {
+    // //   uint userId = _start + i;
+    // //   _users[i] = usersArr[userId].userAddr;
+    // // }
+
+    // return _users;
+
+    require(usersArr.length < 50 , "Can not fetch more than 50 results");
+
     _users = usersArr;
     return _users;
   }
@@ -239,12 +275,15 @@ contract NotesMarketContract {
   }
 
   function getAllNotes() userExists(msg.sender) view external returns (Note[] memory){
+    require(notesArr.length < 50 , "Can not fetch more than 50 results");
+
     Note[] memory _notes;
     _notes = notesArr;
     return _notes;
   }
 
-  function buyNote(bytes32 noteHash) notesMarketIsOpen userExists(msg.sender) doesNoteExist(noteHash) sufficientFunds(notesArr[notesHashes[noteHash] - 1].price) payable external {
+  function buyNote(bytes32 noteHash) theLazyCornerIsOpen userExists(msg.sender) doesNoteExist(noteHash) sufficientFunds(notesArr[notesHashes[noteHash] - 1].price) returnExcess(notesArr[notesHashes[noteHash] - 1].price) payable external {
+    
     uint noteId = notesHashes[noteHash];
     Note memory note = notesArr[noteId - 1];
     
@@ -260,8 +299,12 @@ contract NotesMarketContract {
     note.purchaseCount ++;
     notesArr[noteId - 1].purchaseCount = note.purchaseCount;
 
-    seller.transfer(paymentToSeller);
-    admin.transfer(commissionFunds);
+    // seller.transfer(paymentToSeller);
+    // admin.transfer(commissionFunds);
+    (bool successSellerPayment, ) = seller.call{value: paymentToSeller}("");
+    require(successSellerPayment, "Failed to send payment to seller");
+    (bool successAdminPayment, ) = admin.call{value: commissionFunds}("");
+    require(successAdminPayment, "Failed to send commission to admin");
     
     emit NoteBought("note bought", noteHash, msg.sender, seller);
 

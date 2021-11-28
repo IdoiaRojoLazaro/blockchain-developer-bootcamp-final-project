@@ -1,8 +1,8 @@
 let BN = web3.utils.BN;
-const NotesMarketContract = artifacts.require('NotesMarketContract');
+const TheLazyCornerContract = artifacts.require('TheLazyCornerContract');
 let catchRevert = require('./exceptionsHelpers.js').catchRevert;
 
-contract('NotesMarketContract', function (accounts) {
+contract('TheLazyCornerContract', function (accounts) {
   let instance;
   const admin = accounts[0];
   const seller_1 = accounts[1];
@@ -30,11 +30,11 @@ contract('NotesMarketContract', function (accounts) {
   };
 
   beforeEach(async () => {
-    instance = await NotesMarketContract.new({ from: admin });
+    instance = await TheLazyCornerContract.new({ from: admin });
   });
 
   it('Should revert an operation if contract has been desactivated by circuit breaker', async () => {
-    await instance.changeNotesMarketStatus({ from: admin });
+    await instance.changeTheLazyCornerStatus({ from: admin });
     await catchRevert(instance.addUser(false, { from: buyer_1 }));
   });
 
@@ -130,14 +130,7 @@ contract('NotesMarketContract', function (accounts) {
       { from: seller_1 }
     );
 
-    // instance
-    //   .getAvailableNotes(10, 0, { from: seller_1 })
-    //   .then((res) => console.log(res));
-    // await catchRevert(instance.getAvailableNotes(1, 10, { from: seller_1 }));
-    await instance
-      .getAllNotes({ from: seller_1 })
-      .then((res) => console.log(res));
-    //await catchRevert(instance.getAllNotes({ from: seller_1 }));
+    await instance.getAllNotes({ from: seller_1 });
   });
 
   it('Should return list of users registered', async () => {
@@ -148,7 +141,12 @@ contract('NotesMarketContract', function (accounts) {
 
     let users = await instance.getAllUsers({ from: admin });
 
-    assert.equal(users.length, 4, 'Length of users registered is 4');
+    assert.equal(users.length, 4, 'Users length must be 4');
+
+    // assert.equal(usersPage1.length, 3, 'Users length page 1 must be 3');
+
+    // let usersPage2 = await instance.getAllUsers(3, { from: admin });
+    // assert.equal(usersPage2.length, 1, 'Users length page 2 must be 1');
   });
 
   it('...should charge required fee for note and refund excess', async () => {
@@ -184,51 +182,51 @@ contract('NotesMarketContract', function (accounts) {
       value: noteOne.price
     });
     console.log(noteBought.logs);
-    // assert(
-    //   noteBought.logs[0].event,
-    //   'NoteBought',
-    //   'must emit NoteBought after successful purchase'
-    // );
+    assert(
+      noteBought.logs[0].event,
+      'NoteBought',
+      'must emit NoteBought after successful purchase'
+    );
 
-    // // final balances
-    // let seller_1BalanceAfter = await web3.eth.getBalance(seller_1);
-    // let buyer_1BalanceAfter = await web3.eth.getBalance(buyer_1);
-    // let adminBalanceAfter = await web3.eth.getBalance(admin);
-    // //console.log(seller_1BalanceAfter, buyer_1BalanceAfter, adminBalanceAfter);
+    // final balances
+    let seller_1BalanceAfter = await web3.eth.getBalance(seller_1);
+    let buyer_1BalanceAfter = await web3.eth.getBalance(buyer_1);
+    let adminBalanceAfter = await web3.eth.getBalance(admin);
+    //console.log(seller_1BalanceAfter, buyer_1BalanceAfter, adminBalanceAfter);
 
-    // let commissionFee = new BN(noteOne.price).div(new BN(100));
-    // let paymentToSeller = new BN(noteOne.price).sub(new BN(commissionFee));
-    // //console.log(commissionFee, paymentToSeller);
+    let commissionFee = new BN(noteOne.price).div(new BN(100));
+    let paymentToSeller = new BN(noteOne.price).sub(new BN(commissionFee));
+    //console.log(commissionFee, paymentToSeller);
 
-    // //console.log('sent: ', 2500, 'price: ', noteOne.price, 'commission: ', commissionFee, 'sellerPayment: ', paymentToSeller);
+    //console.log('sent: ', 2500, 'price: ', noteOne.price, 'commission: ', commissionFee, 'sellerPayment: ', paymentToSeller);
 
-    // let purchasedNotes = await instance.getMyPurchasedNotes({ from: buyer_1 });
-    // let allNotes = await instance.getAllNotes({ from: seller_1 });
-    // //console.log('****************');
-    // console.log(allNotes[0].purchaseCount);
-    // assert(purchasedNotes.length, 1, 'buyer purchased notes count must be 1');
-    // assert.equal(
-    //   allNotes[0].purchaseCount,
-    //   1,
-    //   'note purchaseCount must increase by 1'
-    // );
+    let purchasedNotes = await instance.getMyPurchasedNotes({ from: buyer_1 });
+    let allNotes = await instance.getAllNotes({ from: seller_1 });
+    //console.log('****************');
+    console.log(allNotes[0].purchaseCount);
+    assert(purchasedNotes.length, 1, 'buyer purchased notes count must be 1');
+    assert.equal(
+      allNotes[0].purchaseCount,
+      1,
+      'note purchaseCount must increase by 1'
+    );
 
-    // assert.equal(
-    //   new BN(seller_1BalanceAfter).toString(),
-    //   new BN(seller_1BalanceBefore).add(paymentToSeller).toString(),
-    //   "seller_1's balance should be increased by price of note minus commission"
-    // );
+    assert.equal(
+      new BN(seller_1BalanceAfter).toString(),
+      new BN(seller_1BalanceBefore).add(paymentToSeller).toString(),
+      "seller_1's balance should be increased by price of note minus commission"
+    );
 
-    // assert.equal(
-    //   new BN(adminBalanceAfter).toString(),
-    //   new BN(adminBalanceBefore).add(commissionFee).toString(),
-    //   "notes shop's balance should be increased by commission fee of note"
-    // );
+    assert.equal(
+      new BN(adminBalanceAfter).toString(),
+      new BN(adminBalanceBefore).add(commissionFee).toString(),
+      "notes shop's balance should be increased by commission fee of note"
+    );
 
-    // assert.isBelow(
-    //   Number(buyer_1BalanceAfter),
-    //   Number(new BN(buyer_1BalanceBefore).sub(new BN(noteOne.price))),
-    //   "buyer_1's balance should be decreased by price of note and gas cost"
-    // );
+    assert.isBelow(
+      Number(buyer_1BalanceAfter),
+      Number(new BN(buyer_1BalanceBefore).sub(new BN(noteOne.price))),
+      "buyer_1's balance should be decreased by price of note and gas cost"
+    );
   });
 });

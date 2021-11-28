@@ -1,9 +1,9 @@
 import Web3 from 'web3';
-import NotesMarketContract from './contracts/NotesMarketContract.json';
+import TheLazyCornerContract from './contracts/TheLazyCornerContract.json';
 
 const address = process.env.REACT_APP_CONTRACT_ADDR;
 
-const abi = NotesMarketContract.abi;
+const abi = TheLazyCornerContract.abi;
 
 const web3 =
   typeof window.web3 !== 'undefined'
