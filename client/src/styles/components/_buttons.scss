@@ -1,5 +1,4 @@
-button,
-.swal2-styled.swal2-confirm {
+button {
   background: none;
   border: 0;
   padding: 5px 10px;
@@ -41,5 +40,15 @@ button,
     border-color: $c-error;
     background: #fff;
     color: $c-error;
+  }
+}
+.swal2-styled.swal2-confirm {
+  background: #fff !important;
+  color: $c-blue-primary !important;
+  &:hover,
+  &:focus {
+    outline: none;
+    background: none !important;
+    box-shadow: 0 0px 8px -4px rgb(0, 0, 0);
   }
 }
