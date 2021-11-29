@@ -74,5 +74,5 @@ To run the DApp locally:
 
 ## Screencast
 
-### Seller registers, admin approves seller: https://youtu.be/Ss4rM23EriI
-### Seller creates note. Buyer registers and buy note: https://youtu.be/8gsyq7Hr8mM
+* Seller registers, admin approves seller: https://youtu.be/Ss4rM23EriI
+* Seller creates note. Buyer registers and buy note: https://youtu.be/8gsyq7Hr8mM
