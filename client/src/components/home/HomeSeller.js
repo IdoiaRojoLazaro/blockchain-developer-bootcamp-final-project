@@ -32,7 +32,7 @@ export const HomeSeller = ({ contract, account }) => {
       ) : (
         <p className="warning">
           <Warning size={18} />
-          you have not yet been approved by the admin
+          You have not yet been approved by the admin
         </p>
       )}
 
