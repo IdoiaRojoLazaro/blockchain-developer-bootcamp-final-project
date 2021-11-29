@@ -57,7 +57,7 @@ To run the DApp locally:
 ### Flow
 1. `ganache-cli`
 2. Run client locally (see upside)
-3. Add first account provided by ganache to metamask (will be admin account), and **Sign up as Seller** with the admin account in the [login] (http://localhost:3000/login)
+3. Add first account provided by ganache to metamask (will be admin account), and **Sign up as Seller** with the admin account in the [login](http://localhost:3000/login)
 4. Repeat the process with another account, to create a seller
 5. Repeat the process with another account, to create a buyer **Sign up as Buyer**
 6. Return to the admin account(change account on metamask and refresh page), and approve the seller from the Admin home page 
@@ -72,7 +72,7 @@ To run the DApp locally:
     * There should be the note bought on **Notes Bought** tab, with button **See** that opens the PDF with the file uploaded to the note
 
 
-## Screenrecorder
+## Screencast
 
-[Seller registers, admin approves seller] (https://youtu.be/Ss4rM23EriI)
-[Seller creates note. Buyer registers and buy note] (https://youtu.be/8gsyq7Hr8mM)
+### Seller registers, admin approves seller: https://youtu.be/Ss4rM23EriI
+### Seller creates note. Buyer registers and buy note: https://youtu.be/8gsyq7Hr8mM
