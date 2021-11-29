@@ -20,6 +20,7 @@ export const HomeAdmin = ({ contract, account }) => {
     if (contract !== null && account !== '') {
       dispatch(getUsers(contract, account));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleApprove = (e, accountSeller) => {
@@ -99,6 +100,8 @@ export const HomeAdmin = ({ contract, account }) => {
                               )}
                             </td>
                           );
+                        default:
+                          return '';
                       }
                     })}
                   </tr>

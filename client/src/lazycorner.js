@@ -14,6 +14,3 @@ const contractInstance =
   web3 !== null ? new web3.eth.Contract(abi, address) : null;
 
 export { contractInstance };
-
-// const accountsWeb3 = web3 !== null ? new web3.eth.getAccounts() : null;
-// export default new web3.eth.getAccounts();

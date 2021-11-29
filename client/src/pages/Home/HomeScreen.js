@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Layout } from '../../components/layout/Layout';
@@ -11,12 +11,11 @@ export const HomeScreen = ({ contract, account }) => {
   const dispatch = useDispatch();
   const { role } = useSelector(state => state.auth);
 
-  const [show, setShow] = useState(false);
-
   useEffect(() => {
     if (contract !== null && account !== '' && role !== 'admin') {
       dispatch(getNotes(contract, account));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -12,7 +12,7 @@ export const getNotes = (contract, account) => {
           payload: res
         })
       )
-      .catch(err => console.log(err));
+      .catch(() => console.log('Err getting notes'));
   };
 };
 
@@ -23,13 +23,12 @@ export const getMyPurchasedNotes = (contract, account) => {
       .getMyPurchasedNotes()
       .call({ from: account })
       .then(res => {
-        console.log(res);
         dispatch({
           type: types.setNotesBought,
           payload: res
         });
       })
-      .catch(err => console.log(err));
+      .catch(() => console.log('Err getMyPurchasedNotes'));
   };
 };
 
@@ -37,7 +36,7 @@ export const getUploadedNotes = (contract, account) => {
   return async dispatch => {
     dispatch({ type: types.notesLoading });
     contract.methods
-      .getOwnedNotes()
+      .getMyUploadedNotes()
       .call({ from: account })
       .then(res => {
         dispatch({
@@ -45,6 +44,6 @@ export const getUploadedNotes = (contract, account) => {
           payload: res
         });
       })
-      .catch(err => console.log(err));
+      .catch(() => console.log('Err getUploadedNotes'));
   };
 };

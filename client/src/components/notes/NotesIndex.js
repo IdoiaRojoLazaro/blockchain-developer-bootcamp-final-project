@@ -23,7 +23,7 @@ export const NotesIndex = ({ filterActive, notes, account, contract }) => {
   };
   return (
     <>
-      {notes !== null ? (
+      {notes !== null && notes.length > 0 ? (
         notes.map((note, i) => (
           <div
             className={`note ${filterActive === 'bought' ? 'bought' : ''}`}
@@ -50,7 +50,6 @@ export const NotesIndex = ({ filterActive, notes, account, contract }) => {
         <div className="no-results">
           <Flashlight size={48} />
           <h3>No results found</h3>
-
           <p>
             {role === 'seller'
               ? 'You have not uploaded any notes yet'

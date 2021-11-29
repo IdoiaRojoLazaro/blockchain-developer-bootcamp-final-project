@@ -22,7 +22,10 @@ Use of `revert(), view, keccak256()` instead of `throw, constant, sha3()`
 Low-level call return value is checked to make sure to handle the possibility that the call will fail.
 
 ## Checks-Effects-Interactions Pattern - SWC-107
-All internal state changes are performed before the call is executed
+All internal state changes are performed before the call is executed. ReturnExcess 
+
+## Reentrancy attack 
+Reentrancy Guard present in the ReturnExcess function
 
 ## Gas Limit and Loops
 Loops are limited when they are needed. // TO-DO fetch in batches

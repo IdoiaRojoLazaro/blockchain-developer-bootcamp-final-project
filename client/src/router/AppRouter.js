@@ -41,10 +41,8 @@ export const AppRouter = () => {
       await web3()
         .then(web3 => {
           web3.eth.getAccounts().then(accounts => {
-            console.log(accounts);
             setAccount(accounts[0]);
             web3.eth.getBalance(accounts[0]).then(balanceValue => {
-              //let balanceFormat = utils.formatEther(balanceValue);
               let balanceFormat = balanceValue;
               setBalance(balanceFormat);
               getContract(accounts[0], balanceFormat);
@@ -63,6 +61,7 @@ export const AppRouter = () => {
         });
     }
     connectToWeb3();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getContract = async (acc, bal) => {
@@ -82,7 +81,6 @@ export const AppRouter = () => {
         .getUser()
         .call({ from: account })
         .then(res => {
-          console.log(res);
           const role = res._isAdmin
             ? 'admin'
             : res._isSeller
@@ -100,8 +98,7 @@ export const AppRouter = () => {
             }
           });
         })
-        .catch(err => {
-          console.log(err);
+        .catch(() => {
           localStorage.clear();
           dispatch({
             type: types.authFinishLoading

@@ -31,13 +31,12 @@ export const NoteShowModal = ({ show, setShow, contract, account }) => {
   const { balance, role } = useSelector(state => state.auth);
 
   const [loadingSubmit, setLoadingSubmit] = useState(false);
-  const balanceFormat = useFormatBalance(balance);
 
   const closeModal = () => setShow(false);
 
   const handleSubmitForm = e => {
     e.preventDefault();
-    if (balanceFormat < noteActive.price) {
+    if (balance < noteActive.price) {
       swalError(
         'Add some credit to your wallet and refresh the page',
         'Insufficient funds to buy the note'
@@ -59,7 +58,6 @@ export const NoteShowModal = ({ show, setShow, contract, account }) => {
 
       response
         .then(txn => {
-          console.log('Note bought: ', txn);
           if (txn.status && txn.events.NoteBought) {
             Swal.fire({
               icon: 'success',
@@ -72,16 +70,12 @@ export const NoteShowModal = ({ show, setShow, contract, account }) => {
           }
         })
         .catch(err => {
-          console.log(err);
           swalError('There was an error during transaction');
           setLoadingSubmit(false);
         });
     }
   };
 
-  if (noteActive && noteActive !== null) {
-    console.log(noteActive);
-  }
   return (
     <Modal
       isOpen={show}

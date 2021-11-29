@@ -13,7 +13,6 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import Modal from 'react-modal';
 
-import { useToasts } from 'react-toast-notifications';
 import ButtonSubmit from '../shared/ButtonSubmit';
 import { Warning } from 'phosphor-react';
 
@@ -40,7 +39,6 @@ const initInfo = {
 
 export const NoteNewModal = ({ show, setShow, contract, account }) => {
   const dispatch = useDispatch();
-  const { addToast } = useToasts();
   const [formValues, setFormValues] = useState(initInfo);
   const [fileUploaded, setFileUploaded] = useState(null);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -81,7 +79,6 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
 
       response
         .then(txn => {
-          console.log('txn note added: ', txn);
           if (txn.status && txn.events.NoteAdded) {
             Swal.fire({
               icon: 'success',
@@ -91,8 +88,7 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
             closeModal();
           }
         })
-        .catch(err => {
-          console.log(err);
+        .catch(() => {
           swalError('There was an error during transaction');
           closeModal();
         });
@@ -126,7 +122,6 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
         return IpfsHash;
       })
       .catch(function (error) {
-        console.log(error);
         Swal.fire('Error', error, 'error');
       });
   };

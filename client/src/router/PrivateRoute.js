@@ -11,10 +11,6 @@ export const PrivateRoute = ({
   component: Component,
   ...rest
 }) => {
-  const isAuthenticated2 = localStorage.getItem('isAuthenticated');
-  console.log('--- isAuthenticated ---');
-  console.log(isAuthenticated);
-  console.log(isAuthenticated2);
   return (
     <Route
       {...rest}

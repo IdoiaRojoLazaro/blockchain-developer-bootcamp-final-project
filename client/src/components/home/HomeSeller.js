@@ -1,7 +1,7 @@
 import { Warning } from 'phosphor-react';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getNotes, getUploadedNotes } from '../../actions/notes';
+import { getUploadedNotes } from '../../actions/notes';
 
 import { types } from '../../types/types';
 import { NoteNewModal } from '../notes/NoteNewModal';
@@ -18,6 +18,7 @@ export const HomeSeller = ({ contract, account }) => {
     if (approveToSell && notes !== null && notes !== []) {
       dispatch(getUploadedNotes(contract, account));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notes]);
 
   return (
@@ -31,7 +32,7 @@ export const HomeSeller = ({ contract, account }) => {
       ) : (
         <p className="warning">
           <Warning size={18} />
-          You are not yet approved by the admin to sell
+          you have not yet been approved by the admin
         </p>
       )}
 

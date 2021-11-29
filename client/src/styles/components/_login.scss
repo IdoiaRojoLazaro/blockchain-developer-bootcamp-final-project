@@ -33,6 +33,9 @@
       &:hover:after {
         width: 100%;
       }
+      &:hover {
+        box-shadow: none !important;
+      }
     }
     .loading {
       position: unset;

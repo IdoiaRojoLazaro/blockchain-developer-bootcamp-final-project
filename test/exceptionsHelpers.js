@@ -1,17 +1,15 @@
-const errorString = 'VM Exception while processing transaction: ';
+const PREFIX = 'VM Exception while processing transaction: ';
 
 async function tryCatch(promise, reason) {
   try {
     await promise;
     throw null;
   } catch (error) {
-    // console.log('------- ERROR --------');
-    // console.log(error);
-    assert(error, 'Expected a VM exception but did not get one');
+    assert(error, 'Expected an error but did not get one');
     assert(
-      error.message.search(errorString + reason) >= 0,
+      error.message.search(PREFIX + reason) >= 0,
       "Expected an error containing '" +
-        errorString +
+        PREFIX +
         reason +
         '" but got "' +
         error.message +

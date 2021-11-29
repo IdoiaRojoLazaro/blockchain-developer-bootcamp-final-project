@@ -3,14 +3,12 @@ pragma solidity >=0.8.0;
 pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-/// @title The Lazy Corner Contract
-/// @author Idoia Rojo Lázaro
-/// @notice Explain to an end user what this does
-/// @dev Contract for selling and bying notes market
+/** 
+  * @title The Lazy Corner Contract
+  * @author Idoia Rojo Lázaro
+  * @dev Contract for selling and bying notes
+*/
 
-/**
-@title 
- */
 contract TheLazyCornerContract {
 
   using SafeMath for uint256;
@@ -24,44 +22,45 @@ contract TheLazyCornerContract {
 
   Note[] public notesArr;
   User[] public usersArr;
+  bool locked = false;
 
-  // List of notes indexed by note hash -> numerical id
+  // List of notes indexed by note hash
   mapping(bytes32 => uint) private notesHashes;
 
-  // List of notes indexed by ifps hash -> note id hash
+  // List of notes indexed by ifps hash
   mapping(bytes32 => bytes32) private IPFSHashes;
 
   // List of users indexed by address
   mapping(address => User) private users;
 
   // List of all note purchase tokens
-  // for each note(noteHash), there is a collection of buyers' accessTokens(add -> accessToken)
+  // Each note(noteHash) has a collection of buyers' accessTokens(addr -> accessToken)
   mapping(bytes32 => mapping(address => bytes32)) private purchaseTokens;
 
-  // List of notes bought by users
+  // List of notes bought by buyers
   mapping(address => bytes32[]) private boughtNotes;
 
-  // List of notes owned by users
+  // List of notes owned by sellers
   mapping(address => bytes32[]) private ownedNotes;
 
 
   // STRUCTS
 
-  // User -> buyer and/or seller
-  // Buy -> All users can buy notes
-  // Sell -> Just approved users can sell notes
+  // User -> buyer or seller
+  // Buy -> All buyers can buy notes
+  // Sell -> Just approved sellers can sell notes
   struct User{
-    uint id;
+    uint id; // id - 1 -> position of user in array
     address userAddr;
     bool seller; // Note owner
     bool isSellerApproved; // Is approved to sell
-    uint8 exits;  
+    uint8 exits;  // is registered
   }
 
   struct Note{
     bytes32 noteHash; // note id hash
     bytes32 IPFSHash; // note ipfs reference
-    uint id; // id - 1 -> position of note in dynamic array
+    uint id; // id - 1 -> position of note in array
     address payable owner; 
     uint256 price; // price in tokens
     uint120 purchaseCount; // number of notes purchases
@@ -84,32 +83,65 @@ contract TheLazyCornerContract {
 
 
   // MODIFIERS
+  /** 
+    * @dev Checks if caller is role admin
+    * @param userAddress Address of user
+  */
   modifier isAdmin(address userAddress){
     require(userAddress == admin, "Is not admin");
     _;
   }
-  
+
+  /** 
+    * @dev Checks if thelazycorner(market) is open - circuit breaker
+  */
   modifier theLazyCornerIsOpen(){
     require(theLazyCornerIsClosed == false, "Notesmarket is closed by admin" );
     _;
   }
-
+  
+  /** 
+    * @dev Checks if the user exists
+    * @param userAddress Address of user
+  */
   modifier userExists(address userAddress){
     require(users[userAddress].exits == 1, "User doesn't exist" );
     _;
   }
 
+  /** 
+    * @dev Checks if is the admin or a user that exists
+    * @param userAddress Address of user, noteHash hash of the note
+  */
   modifier isUserOrAdmin(address userAddress){
      require(users[userAddress].exits == 1 || userAddress == admin, "User doesn't exist" );
     _;
   }
 
+  /** 
+    * @dev Checks if the user is the admin or the owner of the note
+    * @param userAddress Address of user, noteHash hash of the note
+    * @param noteHash hash of the note
+  */
   modifier isNoteOwnerOrAdmin(address userAddress, bytes32 noteHash){
     uint noteId = notesHashes[noteHash];
     require(userAddress == admin || userAddress == notesArr[noteId - 1].owner, "Is not admin nor the note owner");
     _;
   }
-
+  
+  /** 
+    * @dev Checks if a user is approved to sell notes
+    * @param userAddress Address of user, noteHash hash of the note
+  */
+  modifier canSellNotes(address userAddress){
+    require(users[userAddress].seller && users[userAddress].isSellerApproved, "User can't sell notes");
+    _;
+  }
+    
+  /** 
+    * @dev Checks if the note exists
+    * @param noteHash hash of the note
+  */
   modifier doesNoteExist(bytes32 noteHash){
     require(notesHashes[noteHash] != 0, "Note doesn't exist");
     uint noteId = notesHashes[noteHash];
@@ -117,45 +149,60 @@ contract TheLazyCornerContract {
     _;
   }
 
+  /** 
+    * @dev Checks if the note has not been purchased
+    * @param noteHash hash of the note
+  */
   modifier notPurchased(bytes32 noteHash){
     uint noteId = notesHashes[noteHash];
     require(notesArr[noteId - 1].purchaseCount == 0, "Note has been purchased");
     _;
   }
 
-  modifier canSellNotes(address userAddress){
-    require(users[userAddress].seller && users[userAddress].isSellerApproved, "User can't sell notes");
-    _;
-  }
-
+  /** 
+    * @dev Checks if a user has sufficient funds to buy a note
+    * @param price Price of the note
+  */
   modifier sufficientFunds(uint price){
     require(price <= msg.sender.balance, "Insufficient funds");
     _;
   }
 
+  /** 
+    * @dev Refunds with excess money to buyer after payment
+    * @param price Price of the note
+  */
   modifier returnExcess(uint price) {
-    //refund them after pay for book
+    //refund them after pay for note
     _;
-    //this is a silent failure if "there is no leftover to refund to buyer"
+    // Silent failure if "there is no leftover to refund to buyer"
       if(msg.value > price){ 
+        require(!locked, "Reentrant call detected!");
+        locked = true;
         uint amountToRefund = msg.value - price;
-        // payable(msg.sender).transfer(amountToRefund);
         
         (bool success, ) = payable(msg.sender).call{value: amountToRefund}("");
         require(success);
+        locked = false;
       }        
   }
 
   // FUNCTIONS
 
   /* NoteMarket */
-
+      
+  /** 
+    * @dev Toggle contract status(open/close), just the admin can do it(Circuit breaker)
+  */
   function changeTheLazyCornerStatus() isAdmin(msg.sender) external{
     theLazyCornerIsClosed = !theLazyCornerIsClosed;
   }
 
   /* Users */
-  
+  /** 
+    * @dev Register of a new user
+    * @param isSeller Is seller or buyer?
+  */
   function addUser(bool isSeller) theLazyCornerIsOpen external{
     require(users[msg.sender].exits == 0, "User already registered");
 
@@ -172,6 +219,9 @@ contract TheLazyCornerContract {
     emit UserCreated("User successfully created", msg.sender, isSeller);
   }
 
+  /** 
+    * @dev Delete a user that exists, and delete all of its notes
+  */
   function removeUser() userExists(msg.sender) external{
     if(users[(msg.sender)].seller){
       bytes32[] memory hashes = ownedNotes[msg.sender];
@@ -186,6 +236,9 @@ contract TheLazyCornerContract {
     emit UserRemoved("User successfully deleted");
   }
 
+  /** 
+    * @dev Get info of a user, just if it's the user itself or the admin
+  */
   function getUser() isUserOrAdmin(msg.sender) view external returns(bool _authStatus, bool _isSeller, bool _isAdmin, bool _isSellerApproved){
       _authStatus = true;
       _isSeller = users[msg.sender].seller;
@@ -193,7 +246,10 @@ contract TheLazyCornerContract {
       if(msg.sender == admin) _isAdmin = true;
   }
 
-
+  /** 
+    * @dev Approve a seller to sell notes and receive payments, just the admin can do it
+    * @param userAddress Address of user, noteHash hash of the note
+  */
   function approveSeller(address userAddress) theLazyCornerIsOpen isAdmin(msg.sender) userExists(userAddress) external{
     if(users[userAddress].seller){
       User storage user = users[userAddress];
@@ -206,29 +262,10 @@ contract TheLazyCornerContract {
   }
 
   /** 
-    * @dev Admin fetches users using filters, max 50 results
+    * @dev Admin fetches users using filters, max 50 results // TO-DO pagination
     * @return _users array of users
     */
   function getAllUsers() isAdmin(msg.sender) view external returns (User[] memory _users){
-    //require(_start <= usersArr.length, "No results for that page");
-    
-    // uint perPage = 2; //per page
-    // uint maxIterations = perPage;
-    // address[] memory _users;
-
-    // _usersAddress = new address[](1);
-
-    // // if(_start.add(perPage) <  usersArr.length){
-    // //   maxIterations = usersArr.length - _start.add(perPage);
-    // // }
-
-    // // for(uint i=0; i < maxIterations; i++) {
-    // //   uint userId = _start + i;
-    // //   _users[i] = usersArr[userId].userAddr;
-    // // }
-
-    // return _users;
-
     require(usersArr.length < 50 , "Can not fetch more than 50 results");
 
     _users = usersArr;
@@ -236,9 +273,16 @@ contract TheLazyCornerContract {
   }
 
   /* Notes */
-
+  /** 
+    * @dev Create a new note
+    * @param _IPFShash Hash of the file(note) uploaded to IPFS
+    * @param _title Title of the note
+    * @param _description Description of the note
+    * @param _author Author of the note
+    * @param _price Price of the note (eth)
+    */
   function addNote(bytes32 _IPFShash, string memory _title, string memory _description, string memory _author, uint256 _price) 
-    userExists(msg.sender) canSellNotes(msg.sender) external{
+    theLazyCornerIsOpen userExists(msg.sender) canSellNotes(msg.sender) external{
 
     bytes32 _noteHash = IPFSHashes[_IPFShash];
     uint _noteId = notesHashes[_noteHash];
@@ -271,19 +315,19 @@ contract TheLazyCornerContract {
     emit NoteAdded("Note successfully created", _noteHash, _title, _author);
   }
 
+  /** 
+    * @dev Delete an existing note
+    * @param noteHash Hash of the note
+    */
   function removeNote(bytes32 noteHash) doesNoteExist(noteHash) notPurchased(noteHash) isNoteOwnerOrAdmin(msg.sender, noteHash) public{
     delete notesHashes[noteHash];
     emit NoteRemoved("User successfully deleted");
   }
 
-  function getAllNotes() userExists(msg.sender) view external returns (Note[] memory){
-    require(notesArr.length < 50 , "Can not fetch more than 50 results");
-
-    Note[] memory _notes;
-    _notes = notesArr;
-    return _notes;
-  }
-
+  /** 
+    * @dev Buyer buy a note, only if the market is open
+    * @param noteHash Hash of the note
+    */
   function buyNote(bytes32 noteHash) theLazyCornerIsOpen userExists(msg.sender) doesNoteExist(noteHash) sufficientFunds(notesArr[notesHashes[noteHash] - 1].price) returnExcess(notesArr[notesHashes[noteHash] - 1].price) payable external {
     
     uint noteId = notesHashes[noteHash];
@@ -293,16 +337,14 @@ contract TheLazyCornerContract {
     
     uint commissionFunds = note.price.div(100);
     uint paymentToSeller = note.price.sub(commissionFunds);
-    //bytes32 accessToken = generateAccessToken(msg.sender, note.IPFSHash);
+    bytes32 accessToken = generateAccessToken(msg.sender, note.IPFSHash);
     // store access token
-    //purchaseTokens[noteHash][msg.sender] = accessToken;
+    purchaseTokens[noteHash][msg.sender] = accessToken;
     // keep note purchase
     boughtNotes[msg.sender].push(noteHash);
     note.purchaseCount ++;
     notesArr[noteId - 1].purchaseCount = note.purchaseCount;
 
-    // seller.transfer(paymentToSeller);
-    // admin.transfer(commissionFunds);
     (bool successSellerPayment, ) = seller.call{value: paymentToSeller}("");
     require(successSellerPayment, "Failed to send payment to seller");
     (bool successAdminPayment, ) = admin.call{value: commissionFunds}("");
@@ -312,17 +354,28 @@ contract TheLazyCornerContract {
 
   }
 
+  /** 
+    * @dev Admin fetches notes using filters, max 50 results // TO-DO pagination
+    */
+  function getAllNotes() userExists(msg.sender) view external returns (Note[] memory){
+    require(notesArr.length < 50 , "Can not fetch more than 50 results");
+
+    Note[] memory _notes;
+    _notes = notesArr;
+    return _notes;
+  }
+
+  /** 
+    * @dev Fetch all of the notes that the buyer bought
+    */
   function getMyPurchasedNotes() userExists(msg.sender) view public returns(bytes32[] memory _boughtNotes){
     _boughtNotes = boughtNotes[msg.sender];
   }
 
-  function generateAccessToken(address userAddr, bytes32 IPFShash) private pure returns(bytes32) { //isAdmin(msg.sender)
-    bytes32 salt = "S}7#%*SD30o7D";
-    bytes32 accessToken = keccak256(abi.encodePacked(userAddr, IPFShash, salt));
-    return accessToken;
-  }
-
-  function getOwnedNotes() canSellNotes(msg.sender) userExists(msg.sender) view external returns(bytes32[] memory _ownedNotes){
+  /** 
+  * @dev Fetch all of the notes that the seller uploaded, just if it's a seller
+  */
+  function getMyUploadedNotes() canSellNotes(msg.sender) userExists(msg.sender) view external returns(bytes32[] memory _ownedNotes){
     _ownedNotes = ownedNotes[msg.sender];
     for(uint i=0; i < _ownedNotes.length; i++){
       // exclude the leftover hashes in state array map ownedNotes
@@ -332,5 +385,15 @@ contract TheLazyCornerContract {
     }
   }
 
+  /** 
+    * @dev Generate access token to verify that the buyer bought a note, before providing access to the file
+    * @param userAddr Address of user
+    * @param IPFShash Hash of the file(note) uploaded to IPFS
+    */
+  function generateAccessToken(address userAddr, bytes32 IPFShash) private pure returns(bytes32) { //isAdmin(msg.sender)
+    bytes32 salt = "S}7#%*SD30o7D";
+    bytes32 accessToken = keccak256(abi.encodePacked(userAddr, IPFShash, salt));
+    return accessToken;
+  }
   
 }

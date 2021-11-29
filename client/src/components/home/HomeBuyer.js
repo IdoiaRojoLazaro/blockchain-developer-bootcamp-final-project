@@ -26,6 +26,7 @@ export const HomeBuyer = ({ account, contract }) => {
         dispatch(getMyPurchasedNotes(contract, account));
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterActive]);
 
   return (

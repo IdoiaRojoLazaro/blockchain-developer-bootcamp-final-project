@@ -28,8 +28,6 @@ export const LoginScreen = ({ contract, account, balance }) => {
       swalError('You must accept the transaction on metamask to continue');
     });
     response.on('transactionHash', function (hash) {
-      console.log(' ----- transactionHash ------');
-      console.log(hash);
       swalWaitingTxn();
     });
     response.then(res => {
@@ -57,8 +55,6 @@ export const LoginScreen = ({ contract, account, balance }) => {
       .getUser()
       .call({ from: account })
       .then(res => {
-        console.log('user');
-        console.log(res);
         const role = res._isAdmin
           ? 'admin'
           : res._isSeller
@@ -76,9 +72,8 @@ export const LoginScreen = ({ contract, account, balance }) => {
           }
         });
       })
-      .catch(err => {
-        console.log(err);
-        alert('You have no account registered');
+      .catch(() => {
+        swalError('You have no account registered');
       });
   };
 
