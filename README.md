@@ -5,8 +5,10 @@ My blockchain developer bootcamp final project
 ## About
 This DApp is a market place where seller can upload their notes, and buyer can buy it. Above all, it is designed for notes on oppositions exam, where having good notes makes a big difference, and there is a clear market niche. The idea is to provide a secure platform to interchange notes, and ensure that the studious owner of the great notes receive something in exchange. Nerd days are over.
 
-Public interface on Netlify: [The Lazy Corner](https://thelazycorner.netlify.app/)
-Public Ethereum address for NFT: `0xc4c0582aC4982a4f35fCe1FeEADa3b5e3c44cC17`
+### Public interface on Netlify: 
+[The Lazy Corner](https://thelazycorner.netlify.app/)
+### Public Ethereum address for NFT: 
+`0xc4c0582aC4982a4f35fCe1FeEADa3b5e3c44cC17`
 ## Directory structure
     .
     ├── client                           # Frontend react client application
@@ -19,7 +21,7 @@ Public Ethereum address for NFT: `0xc4c0582aC4982a4f35fCe1FeEADa3b5e3c44cC17`
 
 ## Setup App
 ### Prerequisites
-To run de DApp locally, you will need:
+To run the DApp locally, you will need:
 * Node v14.17.0 
 * Truffle v5.4.19
 * Ganache-cli v6.12.2
@@ -55,7 +57,7 @@ To run the DApp locally:
 ### Flow
 1. `ganache-cli`
 2. Run client locally (see upside)
-3. Add first account provided by ganache to metamask (will be admin account), and **Sign up as Seller** with de admin account in the [login] (http://localhost:3000/login)
+3. Add first account provided by ganache to metamask (will be admin account), and **Sign up as Seller** with the admin account in the [login] (http://localhost:3000/login)
 4. Repeat the process with another account, to create a seller
 5. Repeat the process with another account, to create a buyer **Sign up as Buyer**
 6. Return to the admin account(change account on metamask and refresh page), and approve the seller from the Admin home page 
@@ -71,8 +73,6 @@ To run the DApp locally:
 
 
 ## Screenrecorder
-```
-[Seller registers, admin approves seller]: (https://youtu.be/Ss4rM23EriI)
-[Seller creates note. Buyer registers and buy note]: (https://youtu.be/8gsyq7Hr8mM)
 
-```
+[Seller registers, admin approves seller] (https://youtu.be/Ss4rM23EriI)
+[Seller creates note. Buyer registers and buy note] (https://youtu.be/8gsyq7Hr8mM)
