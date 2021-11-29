@@ -1,3 +1,4 @@
+require('dotenv').config();
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const path = require('path');
 
@@ -18,8 +19,9 @@ module.exports = {
     },
     mumbai: {
       provider: new HDWalletProvider(
-        '0x9f9082b1b7312ce4b9fc67fe07f42a0fb2bdc61a0bd0c16e1e199d4256d61d9a',
-        'https://polygon-mumbai.g.alchemy.com/v2/uMyDopkNBbfUQZqqlWgg8U6AR2J0jxnA'
+        process.env.PRIVATE_KEY_ACCOUNT,
+        'https://polygon-mumbai.g.alchemy.com/v2/' +
+          process.env.ALCHEMY_KEY_MUMBAI
       ),
       network_id: 80001
     }
