@@ -21,6 +21,11 @@
     background-size: contain;
     cursor: auto;
   }
+  &.already-bought {
+    background: url('/images/logo_big_opacity.png') center no-repeat;
+    background-size: contain;
+    cursor: auto;
+  }
   p {
     font-size: 14px;
     font-family: 'Cutive';

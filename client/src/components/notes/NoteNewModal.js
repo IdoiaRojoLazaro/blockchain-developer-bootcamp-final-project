@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { getNotes } from '../../actions/notes';
 import { getBytes32FromIpfsHash } from '../../utils/ipfsHashHelper';
@@ -15,6 +15,8 @@ import Modal from 'react-modal';
 
 import ButtonSubmit from '../shared/ButtonSubmit';
 import { Warning } from 'phosphor-react';
+import { getBalance } from '../../utils/connectToWeb3';
+import { types } from '../../types/types';
 
 const { utils } = require('ethers');
 
@@ -37,14 +39,15 @@ const initInfo = {
   price: ''
 };
 
-export const NoteNewModal = ({ show, setShow, contract, account }) => {
+export const NoteNewModal = ({ show, setShow, contract }) => {
   const dispatch = useDispatch();
+  const { account } = useSelector((state) => state.auth);
   const [formValues, setFormValues] = useState(initInfo);
   const [fileUploaded, setFileUploaded] = useState(null);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const { title, description, author, price } = formValues;
 
-  const retrieveFile = e => {
+  const retrieveFile = (e) => {
     e.preventDefault();
     setFileUploaded(e.target.files[0]);
   };
@@ -58,11 +61,11 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
 
   const closeModal = () => setShow(false);
 
-  const handleSubmitForm = e => {
+  const handleSubmitForm = (e) => {
     e.preventDefault();
     setLoadingSubmit(true);
 
-    uploadFilePinata().then(res => {
+    uploadFilePinata().then((res) => {
       let IPFShash = getBytes32FromIpfsHash(res);
 
       swalConnectionMetamask();
@@ -78,12 +81,20 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
       });
 
       response
-        .then(txn => {
+        .then((txn) => {
           if (txn.status && txn.events.NoteAdded) {
             Swal.fire({
               icon: 'success',
               title: 'The note has successfully uploaded'
-            }).then(() => dispatch(getNotes(contract, account)));
+            }).then(() => {
+              dispatch(getNotes(contract, account));
+              getBalance().then((balanceNew) => {
+                dispatch({
+                  type: types.authUpdateBalance,
+                  payload: balanceNew
+                });
+              });
+            });
 
             closeModal();
           }
@@ -133,7 +144,8 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
       style={customStyles}
       closeTimeoutMS={200}
       className="modal"
-      overlayClassName="modal-fondo">
+      overlayClassName="modal-fondo"
+    >
       <form className="container" onSubmit={handleSubmitForm}>
         <div className="modal__header">
           <h3>Upload new note</h3>
@@ -183,7 +195,8 @@ export const NoteNewModal = ({ show, setShow, contract, account }) => {
               name="description"
               onChange={handleInputChange}
               required
-              defaultValue={description}></textarea>
+              defaultValue={description}
+            ></textarea>
           </div>
           <p className="warning">
             <Warning size={18} />

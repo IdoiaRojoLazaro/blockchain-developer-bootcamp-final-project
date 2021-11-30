@@ -30,7 +30,7 @@ export const AppRouter = () => {
     });
   };
 
-  const { checking, status, uid } = useSelector(state => state.auth);
+  const { checking, status, uid } = useSelector((state) => state.auth);
 
   const isAuthenticated = localStorage.getItem('isAuthenticated')
     ? true
@@ -39,10 +39,10 @@ export const AppRouter = () => {
   useEffect(() => {
     async function connectToWeb3() {
       await web3()
-        .then(web3 => {
-          web3.eth.getAccounts().then(accounts => {
+        .then((web3) => {
+          web3.eth.getAccounts().then((accounts) => {
             setAccount(accounts[0]);
-            web3.eth.getBalance(accounts[0]).then(balanceValue => {
+            web3.eth.getBalance(accounts[0]).then((balanceValue) => {
               let balanceFormat = balanceValue;
               setBalance(balanceFormat);
               getContract(accounts[0], balanceFormat);
@@ -52,7 +52,7 @@ export const AppRouter = () => {
             });
           });
         })
-        .catch(e => {
+        .catch((e) => {
           console.log('No web3 injected');
 
           dispatch({
@@ -80,7 +80,7 @@ export const AppRouter = () => {
       contract.methods
         .getUser()
         .call({ from: account })
-        .then(res => {
+        .then((res) => {
           const role = res._isAdmin
             ? 'admin'
             : res._isSeller
@@ -104,6 +104,15 @@ export const AppRouter = () => {
             type: types.authFinishLoading
           });
         });
+    } else {
+      dispatch({
+        type: types.authSetAccountBalance,
+        payload: {
+          account,
+          balance,
+          contract
+        }
+      });
     }
   };
 
@@ -118,7 +127,8 @@ export const AppRouter = () => {
             attributeName="opacity"
             values="0;1;0"
             dur="4s"
-            repeatCount="indefinite"></animate>
+            repeatCount="indefinite"
+          ></animate>
           <animateTransform
             attributeName="transform"
             attributeType="XML"
@@ -126,7 +136,8 @@ export const AppRouter = () => {
             dur="5s"
             from="0 0 0"
             to="360 0 0"
-            repeatCount="indefinite"></animateTransform>
+            repeatCount="indefinite"
+          ></animateTransform>
         </Spinner>
       </div>
     );
@@ -144,8 +155,6 @@ export const AppRouter = () => {
                 component={LoginScreen}
                 isAuthenticated={!!uid}
                 contract={contract}
-                account={account}
-                balance={balance}
               />
               {/* -------- Private routes -------- */}
               <PrivateRoute
@@ -154,8 +163,6 @@ export const AppRouter = () => {
                 component={HomeScreen}
                 isAuthenticated={!!uid}
                 contract={contract}
-                account={account}
-                balance={balance}
               />
               <Redirect to={'/'} />
             </Switch>

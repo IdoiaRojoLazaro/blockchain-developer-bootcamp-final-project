@@ -6,22 +6,15 @@ import { Route, Redirect } from 'react-router-dom';
 export const PrivateRoute = ({
   isAuthenticated,
   contract,
-  account,
-  balance,
   component: Component,
   ...rest
 }) => {
   return (
     <Route
       {...rest}
-      component={props =>
+      component={(props) =>
         isAuthenticated ? (
-          <Component
-            {...props}
-            contract={contract}
-            account={account}
-            balance={balance}
-          />
+          <Component {...props} contract={contract} />
         ) : (
           <Redirect to="/login" />
         )
@@ -33,6 +26,5 @@ export const PrivateRoute = ({
 PrivateRoute.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired,
   contract: PropTypes.object.isRequired,
-  account: PropTypes.string.isRequired,
   component: PropTypes.func.isRequired
 };

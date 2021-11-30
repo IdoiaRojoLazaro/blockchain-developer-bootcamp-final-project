@@ -3,7 +3,7 @@ My blockchain developer bootcamp final project
 
 # The lazy corner
 ## About
-This DApp is a market place where seller can upload their notes, and buyer can buy it. Above all, it is designed for notes on oppositions exam, where having good notes makes a big difference, and there is a clear market niche. The idea is to provide a secure platform to interchange notes, and ensure that the studious owner of the great notes receive something in exchange. Nerd days are over.
+This DApp is a market place where seller can upload their notes, and buyer can buy it. Above all, it is designed for notes on oppositions exams, where having good notes makes a big difference, and there is a clear market niche. The idea is to provide a secure platform to interchange notes, and ensure that the studious owner of the great notes receive something in exchange. Nerd days are over.
 
 ### Public interface on Netlify: 
 [The Lazy Corner](https://thelazycorner.netlify.app/)
@@ -38,6 +38,8 @@ Available in the contracts folder:
 * Compile and deploy contracts mumbai `truffle migrate --network mumbai`
 * Compile and deploy contracts and test `truffle test`
 
+### Unit Test
+The unit test build for the smart contract cover the activate and deactivate of the circuit breaker, with all the functions related. The creation of user, changing of approval status, and creation of notes, the validation of the functions that are accessible just for some roles, the access of a list of notes and users, and the validation of the correct process of payment with the correct transfer of the 90% to the seller and 10% to de admin as commission. 
 ### Run client locally
 Go to `client` folder and create a `.env` file. You will need to add this environment variables with its corresponding value:
 ```
@@ -47,17 +49,23 @@ REACT_APP_PINATA_SECRET_API_KEY =
 REACT_APP_IPFS_GATEAWAY = https://ipfs.io/ipfs/
 ```
 
+You will need another `.env` file located on the root of the project with a private key address and an alchemy key in mumbai (for example) to run the truffle migrate with the mumbai network
+```
+ALCHEMY_KEY_MUMBAI =
+PRIVATE_KEY_ACCOUNT = 
+```
+
 To run the DApp locally:
 * Navigate to client folder `cd /client` 
 * Install all dependencies `npm install` 
 * To build the frontend app `npm run build` 
 * To start the app locally `npm start`
-* Open web browser on [localhost:3000/](http://localhost:3000/)
+* Open web browser on http://localhost:3000/
 
 ### Flow
 1. `ganache-cli`
 2. Run client locally (see upside)
-3. Add first account provided by ganache to metamask (will be admin account), and **Sign up as Seller** with the admin account in the [login](http://localhost:3000/login)
+3. Add first account provided by ganache to metamask (will be admin account), and **Sign up as Seller** with the admin account in the http://localhost:3000
 4. Repeat the process with another account, to create a seller
 5. Repeat the process with another account, to create a buyer **Sign up as Buyer**
 6. Return to the admin account(change account on metamask and refresh page), and approve the seller from the Admin home page 
@@ -68,8 +76,9 @@ To run the DApp locally:
 - Admin home page: there should be a table with two users (the seller (**Approved**), the buyer)
 - Seller home page: there should be the note created
 - Buyer home page: 
-    * There should be the note created on **All notes** tab, there should be the note bought  
-    * There should be the note bought on **Notes Bought** tab, with button **See** that opens the PDF with the file uploaded to the note
+    * On **All notes** tab, will appear all the notes, and the bought one will be styled different. 
+    * On **Notes Bought** tab, will appear just the bought notes. 
+    From both of them, the bought note will have a button **See** that opens the PDF with the file uploaded to the note
 
 
 ## Screencast

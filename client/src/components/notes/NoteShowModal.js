@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import {
   swalConnectionMetamask,
@@ -12,7 +12,10 @@ import Modal from 'react-modal';
 import ButtonSubmit from '../shared/ButtonSubmit';
 import { Loading } from '../shared/Loading';
 import { FilePdf } from 'phosphor-react';
-import { useFormatBalance } from '../../hooks/useFormatBalance';
+import { getBalance } from '../../utils/connectToWeb3';
+import { types } from '../../types/types';
+import { noteIsBought } from '../../utils/generalFunctions';
+import { getIpfsHashFromBytes32 } from '../../utils/ipfsHashHelper';
 
 const customStyles = {
   content: {
@@ -26,17 +29,21 @@ const customStyles = {
 };
 Modal.setAppElement('#root');
 
-export const NoteShowModal = ({ show, setShow, contract, account }) => {
-  const { noteActive } = useSelector(state => state.notes);
-  const { balance, role } = useSelector(state => state.auth);
+export const NoteShowModal = ({ show, setShow, contract }) => {
+  const dispatch = useDispatch();
+
+  const { noteActive, notesBought } = useSelector((state) => state.notes);
+  const { account, role } = useSelector((state) => state.auth);
 
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   const closeModal = () => setShow(false);
 
-  const handleSubmitForm = e => {
+  const handleSubmitForm = async (e) => {
     e.preventDefault();
-    if (balance < noteActive.price) {
+    let balanceAct = await getBalance();
+
+    if (balanceAct < noteActive.price) {
       swalError(
         'Add some credit to your wallet and refresh the page',
         'Insufficient funds to buy the note'
@@ -57,7 +64,7 @@ export const NoteShowModal = ({ show, setShow, contract, account }) => {
       });
 
       response
-        .then(txn => {
+        .then((txn) => {
           if (txn.status && txn.events.NoteBought) {
             Swal.fire({
               icon: 'success',
@@ -66,10 +73,16 @@ export const NoteShowModal = ({ show, setShow, contract, account }) => {
             }).then(() => {
               closeModal();
               setLoadingSubmit(false);
+              getBalance().then((balanceNew) => {
+                dispatch({
+                  type: types.authUpdateBalance,
+                  payload: balanceNew
+                });
+              });
             });
           }
         })
-        .catch(err => {
+        .catch((err) => {
           swalError('There was an error during transaction');
           setLoadingSubmit(false);
         });
@@ -83,7 +96,8 @@ export const NoteShowModal = ({ show, setShow, contract, account }) => {
       style={customStyles}
       closeTimeoutMS={200}
       className="modal modal-show-note"
-      overlayClassName="modal-fondo">
+      overlayClassName="modal-fondo"
+    >
       <form className="container" onSubmit={handleSubmitForm}>
         {noteActive && noteActive !== null ? (
           <>
@@ -98,11 +112,24 @@ export const NoteShowModal = ({ show, setShow, contract, account }) => {
             </div>
             {role === 'buyer' && (
               <div className="modal__footer">
-                <ButtonSubmit
-                  loadingSubmit={loadingSubmit}
-                  text={'buy'}
-                  classNameBtn="btn-fill"
-                />
+                {noteIsBought(noteActive, notesBought) ? (
+                  <a
+                    href={`https://ipfs.io/ipfs/${getIpfsHashFromBytes32(
+                      noteActive['IPFSHash']
+                    )}`}
+                    className="btn btn-fill"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open file
+                  </a>
+                ) : (
+                  <ButtonSubmit
+                    loadingSubmit={loadingSubmit}
+                    text={'buy'}
+                    classNameBtn="btn-fill"
+                  />
+                )}
               </div>
             )}
           </>

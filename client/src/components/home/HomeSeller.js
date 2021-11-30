@@ -8,11 +8,11 @@ import { NoteNewModal } from '../notes/NoteNewModal';
 import { NotesIndex } from '../notes/NotesIndex';
 import { Loading } from '../shared/Loading';
 
-export const HomeSeller = ({ contract, account }) => {
+export const HomeSeller = ({ contract }) => {
   const dispatch = useDispatch();
   const [newNoteModal, setNewNoteModal] = useState(false);
-  const { approveToSell } = useSelector(state => state.auth);
-  const { notes, notesUploaded, status } = useSelector(state => state.notes);
+  const { approveToSell, account } = useSelector((state) => state.auth);
+  const { notes, notesUploaded, status } = useSelector((state) => state.notes);
 
   useEffect(() => {
     if (approveToSell && notes !== null && notes !== []) {
@@ -48,10 +48,7 @@ export const HomeSeller = ({ contract, account }) => {
               filterActive={''}
               notes={notesUploaded}
               contract={contract}
-              account={account}
             />
-
-            {/* <button onClick={loadBoughtNotes}>cargar notes</button> */}
           </>
         )}
       </div>
@@ -59,7 +56,6 @@ export const HomeSeller = ({ contract, account }) => {
         show={newNoteModal}
         setShow={setNewNoteModal}
         contract={contract}
-        account={account}
       />
     </>
   );

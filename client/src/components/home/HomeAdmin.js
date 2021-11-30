@@ -10,10 +10,12 @@ import {
 } from '../../utils/swalFires';
 import { Loading } from '../shared/Loading';
 import Swal from 'sweetalert2';
+import { getBalance } from '../../utils/connectToWeb3';
 
-export const HomeAdmin = ({ contract, account }) => {
+export const HomeAdmin = ({ contract }) => {
   const dispatch = useDispatch();
-  const { users, status } = useSelector(state => state.users);
+  const { account } = useSelector((state) => state.auth);
+  const { users, status } = useSelector((state) => state.users);
   const columns = ['Address', 'Role', 'Approve to sell'];
 
   useEffect(() => {
@@ -39,12 +41,20 @@ export const HomeAdmin = ({ contract, account }) => {
       swalWaitingTxn();
     });
 
-    response.then(res => {
+    response.then((res) => {
       if (res.status === true && res.events.UserSellerApproved) {
         Swal.fire({
           icon: 'success',
           title: 'Seller approved successfully'
-        }).then(() => dispatch(getUsers(contract, account)));
+        }).then(() => {
+          dispatch(getUsers(contract, account));
+          getBalance().then((balanceNew) => {
+            dispatch({
+              type: types.authUpdateBalance,
+              payload: balanceNew
+            });
+          });
+        });
       }
     });
   };
@@ -88,9 +98,10 @@ export const HomeAdmin = ({ contract, account }) => {
                                 ) : (
                                   <button
                                     className="btn btn-warning"
-                                    onClick={e =>
+                                    onClick={(e) =>
                                       handleApprove(e, user.userAddr)
-                                    }>
+                                    }
+                                  >
                                     <Warning size={10} />
                                     Pending approve
                                   </button>

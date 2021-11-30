@@ -22,19 +22,15 @@ export const notesReducer = (state = initialState, action) => {
         status: types.completed
       };
     case types.setNotesBought:
-      let notesBought =
-        action.payload.length > 0
-          ? state.notes.filter(item => action.payload.includes(item.noteHash))
-          : null;
       return {
         ...state,
-        notesBought: notesBought,
+        notesBought: action.payload.length > 0 ? action.payload : [],
         status: types.completed
       };
     case types.setUploadedNotes:
       let notesUploaded =
         action.payload.length > 0
-          ? state.notes.filter(item => action.payload.includes(item.noteHash))
+          ? state.notes.filter((item) => action.payload.includes(item.noteHash))
           : null;
       return {
         ...state,
@@ -45,7 +41,7 @@ export const notesReducer = (state = initialState, action) => {
       return {
         ...state,
         noteActive: state.notes.filter(
-          item => item.noteHash === action.payload
+          (item) => item.noteHash === action.payload
         )[0],
         status: types.completed
       };

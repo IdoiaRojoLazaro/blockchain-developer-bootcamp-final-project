@@ -6,24 +6,17 @@ import { Route, Redirect } from 'react-router-dom';
 export const PublicRoute = ({
   isAuthenticated,
   contract,
-  account,
-  balance,
   component: Component,
   ...rest
 }) => {
   return (
     <Route
       {...rest}
-      component={props =>
+      component={(props) =>
         isAuthenticated ? (
           <Redirect to="/" />
         ) : (
-          <Component
-            {...props}
-            contract={contract}
-            account={account}
-            balance={balance}
-          />
+          <Component {...props} contract={contract} />
         )
       }
     />

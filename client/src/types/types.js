@@ -9,13 +9,12 @@ export const types = {
   authNoMetamaskInstalled: '[auth] authNoMetamaskInstalled',
   authNoWeb3Injected: '[auth] authNoWeb3Injected',
   authWeb3Injected: '[auth] authWeb3Injected',
+  authSetAccountBalance: '[auth] authSetAccountBalance',
+  authUpdateBalance: '[auth] update balance',
   authFinishLoading: '[auth] Finish loading metamask data',
-  // auth
   authCheckingFinish: '[auth] Finish checking login state',
   authCheckingConnectionFail: '[auth] Checking connection fail',
-  authStartLogin: '[auth] Start login',
   authLogin: '[auth] Login',
-  authStartTokenRenew: '[auth] Start token renew',
   authLogout: '[auth] Logout',
   login: '[auth] login',
 

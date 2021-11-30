@@ -5,15 +5,18 @@ import { Layout } from '../../components/layout/Layout';
 import { HomeBuyer } from '../../components/home/HomeBuyer';
 import { HomeSeller } from '../../components/home/HomeSeller';
 import { HomeAdmin } from '../../components/home/HomeAdmin';
-import { getNotes } from '../../actions/notes';
+import { getNotes, getMyPurchasedNotes } from '../../actions/notes';
 
-export const HomeScreen = ({ contract, account }) => {
+export const HomeScreen = ({ contract }) => {
   const dispatch = useDispatch();
-  const { role } = useSelector(state => state.auth);
+  const { role, account } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (contract !== null && account !== '' && role !== 'admin') {
       dispatch(getNotes(contract, account));
+      if (role === 'buyer') {
+        dispatch(getMyPurchasedNotes(contract, account));
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -21,16 +24,12 @@ export const HomeScreen = ({ contract, account }) => {
   return (
     <Layout>
       <div>
-        {role === 'buyer' && (
-          <HomeBuyer contract={contract} account={account} />
-        )}
-        {role === 'seller' && (
-          <HomeSeller contract={contract} account={account} />
-        )}
+        {role === 'buyer' && <HomeBuyer contract={contract} />}
+        {role === 'seller' && <HomeSeller contract={contract} />}
 
         {role === 'admin' && (
           <>
-            <HomeAdmin contract={contract} account={account} />
+            <HomeAdmin contract={contract} />
           </>
         )}
       </div>

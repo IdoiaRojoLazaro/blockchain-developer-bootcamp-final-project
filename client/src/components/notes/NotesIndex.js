@@ -4,10 +4,14 @@ import { getIpfsHashFromBytes32 } from '../../utils/ipfsHashHelper';
 import { Flashlight } from 'phosphor-react';
 import { NoteShowModal } from './NoteShowModal';
 import { types } from '../../types/types';
+import { noteIsBought } from '../../utils/generalFunctions';
 const { utils } = require('ethers');
 
-export const NotesIndex = ({ filterActive, notes, account, contract }) => {
-  const { role } = useSelector(state => state.auth);
+export const NotesIndex = ({ filterActive, contract }) => {
+  const { role } = useSelector((state) => state.auth);
+  const { notes, notesBought, notesUploaded } = useSelector(
+    (state) => state.notes
+  );
   const dispatch = useDispatch();
   const [showNoteModal, setShowNoteModal] = useState(false);
 
@@ -23,29 +27,59 @@ export const NotesIndex = ({ filterActive, notes, account, contract }) => {
   };
   return (
     <>
-      {notes !== null && notes.length > 0 ? (
-        notes.map((note, i) => (
-          <div
-            className={`note ${filterActive === 'bought' ? 'bought' : ''}`}
-            key={i}
-            onClick={e => handleClick(e, note['noteHash'])}>
-            <p className="title">{note['title']}</p>
-            <p>{note['author']}</p>
-            <p className="price">{utils.formatEther(note['price'])}eth</p>
-            <p className="purchase-count">Purchased: {note['purchaseCount']}</p>
-            {filterActive === 'bought' && (
-              <a
-                href={`https://ipfs.io/ipfs/${getIpfsHashFromBytes32(
-                  note['IPFSHash']
-                )}`}
-                className="btn"
-                target="_blank"
-                rel="noopener noreferrer">
-                See
-              </a>
-            )}
-          </div>
-        ))
+      {notes !== null &&
+      (notesBought !== null || notesUploaded !== null) &&
+      notes.length > 0 &&
+      (filterActive !== 'bought' || notesBought.length > 0) ? (
+        role === 'seller' ? (
+          notesUploaded.map((note, i) => (
+            <div
+              className={`note`}
+              key={i}
+              onClick={(e) => handleClick(e, note['noteHash'])}
+            >
+              <p className="title">{note['title']}</p>
+              <p>{note['author']}</p>
+              <p className="price">{utils.formatEther(note['price'])}eth</p>
+              <p className="purchase-count">
+                Purchased: {note['purchaseCount']}
+              </p>
+            </div>
+          ))
+        ) : (
+          notes.map(
+            (note, i) =>
+              (filterActive !== 'bought' ||
+                noteIsBought(note, notesBought)) && (
+                <div
+                  className={`note ${
+                    filterActive === 'bought' ? 'bought' : ''
+                  } ${noteIsBought(note, notesBought) ? 'already-bought' : ''}`}
+                  key={i}
+                  onClick={(e) => handleClick(e, note['noteHash'])}
+                >
+                  <p className="title">{note['title']}</p>
+                  <p>{note['author']}</p>
+                  <p className="price">{utils.formatEther(note['price'])}eth</p>
+                  <p className="purchase-count">
+                    Purchased: {note['purchaseCount']}
+                  </p>
+                  {noteIsBought(note, notesBought) && (
+                    <a
+                      href={`https://ipfs.io/ipfs/${getIpfsHashFromBytes32(
+                        note['IPFSHash']
+                      )}`}
+                      className="btn"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      See
+                    </a>
+                  )}
+                </div>
+              )
+          )
+        )
       ) : (
         <div className="no-results">
           <Flashlight size={48} />
@@ -61,7 +95,6 @@ export const NotesIndex = ({ filterActive, notes, account, contract }) => {
       <NoteShowModal
         show={showNoteModal}
         setShow={setShowNoteModal}
-        account={account}
         contract={contract}
       />
     </>

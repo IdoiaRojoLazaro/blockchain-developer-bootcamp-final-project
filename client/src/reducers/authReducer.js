@@ -29,6 +29,14 @@ export const authReducer = (state = initialState, action) => {
         status: types.completed
       };
 
+    case types.authSetAccountBalance:
+      return {
+        ...state,
+        status: types.completed,
+        account: action.payload.account,
+        balance: action.payload.balance
+      };
+
     case types.authLogin:
       return {
         ...state,
@@ -36,25 +44,19 @@ export const authReducer = (state = initialState, action) => {
         status: types.completed
       };
 
-    // case types.authCheckingFinish:
-    //   return {
-    //     ...state,
-    //     checking: false,
-    //     connection: true
-    //   };
+    case types.authUpdateBalance:
+      return {
+        ...state,
+        balance: action.payload
+      };
 
-    // case types.authCheckingConnectionFail:
-    //   return {
-    //     ...state,
-    //     checking: false,
-    //     connection: false
-    //   };
-
-    // case types.authLogout:
-    //   return {
-    //     checking: false,
-    //     connection: true
-    //   };
+    case types.authLogout:
+      return {
+        checking: false,
+        connection: true,
+        web3Injected: false,
+        status: types.completed
+      };
 
     default:
       return state;

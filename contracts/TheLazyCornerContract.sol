@@ -238,6 +238,10 @@ contract TheLazyCornerContract {
 
   /** 
     * @dev Get info of a user, just if it's the user itself or the admin
+    * @return _authStatus
+    * @return _isSeller
+    * @return _isAdmin
+    * @return _isSellerApproved
   */
   function getUser() isUserOrAdmin(msg.sender) view external returns(bool _authStatus, bool _isSeller, bool _isAdmin, bool _isSellerApproved){
       _authStatus = true;
@@ -356,6 +360,7 @@ contract TheLazyCornerContract {
 
   /** 
     * @dev Admin fetches notes using filters, max 50 results // TO-DO pagination
+    * @return Array of notes
     */
   function getAllNotes() userExists(msg.sender) view external returns (Note[] memory){
     require(notesArr.length < 50 , "Can not fetch more than 50 results");
@@ -367,6 +372,7 @@ contract TheLazyCornerContract {
 
   /** 
     * @dev Fetch all of the notes that the buyer bought
+    * @return _boughtNotes Array of hashes of the notes bought
     */
   function getMyPurchasedNotes() userExists(msg.sender) view public returns(bytes32[] memory _boughtNotes){
     _boughtNotes = boughtNotes[msg.sender];
@@ -374,6 +380,7 @@ contract TheLazyCornerContract {
 
   /** 
   * @dev Fetch all of the notes that the seller uploaded, just if it's a seller
+  * @return _ownedNotes Array of hashes of the owned bought
   */
   function getMyUploadedNotes() canSellNotes(msg.sender) userExists(msg.sender) view external returns(bytes32[] memory _ownedNotes){
     _ownedNotes = ownedNotes[msg.sender];
@@ -389,6 +396,7 @@ contract TheLazyCornerContract {
     * @dev Generate access token to verify that the buyer bought a note, before providing access to the file
     * @param userAddr Address of user
     * @param IPFShash Hash of the file(note) uploaded to IPFS
+    * @return Token
     */
   function generateAccessToken(address userAddr, bytes32 IPFShash) private pure returns(bytes32) { //isAdmin(msg.sender)
     bytes32 salt = "S}7#%*SD30o7D";

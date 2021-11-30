@@ -13,14 +13,19 @@ import {
   swalSuccess,
   swalError
 } from '../utils/swalFires';
+import { getBalance } from '../utils/connectToWeb3';
 
-export const LoginScreen = ({ contract, account, balance }) => {
+export const LoginScreen = ({ contract }) => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const { checking } = useSelector(state => state.auth);
+  const { checking, account, balance } = useSelector((state) => state.auth);
   const [loading, setLoading] = useState(false);
 
-  const addNewUser = async isSeller => {
+  const refreshPage = () => {
+    window.location.href = '/';
+  };
+
+  const addNewUser = async (isSeller) => {
     setLoading(true);
     let response = contract.methods.addUser(isSeller).send({ from: account });
     swalConnectionMetamask();
@@ -30,16 +35,19 @@ export const LoginScreen = ({ contract, account, balance }) => {
     response.on('transactionHash', function (hash) {
       swalWaitingTxn();
     });
-    response.then(res => {
+    response.then((res) => {
       if (res.status === true && res.events.UserCreated) {
         swalSuccess('You have been successfully registered');
-
+        getBalance().then((balanceNew) => {
+          dispatch({
+            type: types.authUpdateBalance,
+            payload: balanceNew
+          });
+        });
         localStorage.setItem('isAuthenticated', true);
         dispatch({
           type: types.authLogin,
           payload: {
-            account: account,
-            balance: balance,
             isAuthenticated: true,
             role: isSeller ? 'seller' : 'buyer',
             uid: 1
@@ -54,7 +62,7 @@ export const LoginScreen = ({ contract, account, balance }) => {
     contract.methods
       .getUser()
       .call({ from: account })
-      .then(res => {
+      .then((res) => {
         const role = res._isAdmin
           ? 'admin'
           : res._isSeller
@@ -86,15 +94,19 @@ export const LoginScreen = ({ contract, account, balance }) => {
             {cropAccountString(account)}
           </button>
         ) : (
-          <button className="btn">Connect</button>
+          <button className="btn" onClick={refreshPage}>
+            Connect
+          </button>
         )}
       </div>
       <div>
         <LogoBig />
         <Title />
-        <p>
-          You must provide a <b>metamask</b> account to enter the market
-        </p>
+        {!account && (
+          <p>
+            You must provide a <b>metamask</b> account to enter the market
+          </p>
+        )}
         {checking && (
           <div className="loading">
             <Spinner weight="duotone" size={60}>
@@ -102,7 +114,8 @@ export const LoginScreen = ({ contract, account, balance }) => {
                 attributeName="opacity"
                 values="0;1;0"
                 dur="4s"
-                repeatCount="indefinite"></animate>
+                repeatCount="indefinite"
+              ></animate>
               <animateTransform
                 attributeName="transform"
                 attributeType="XML"
@@ -110,7 +123,8 @@ export const LoginScreen = ({ contract, account, balance }) => {
                 dur="5s"
                 from="0 0 0"
                 to="360 0 0"
-                repeatCount="indefinite"></animateTransform>
+                repeatCount="indefinite"
+              ></animateTransform>
             </Spinner>
             <h5>Waiting for connection with metamask...</h5>
           </div>
