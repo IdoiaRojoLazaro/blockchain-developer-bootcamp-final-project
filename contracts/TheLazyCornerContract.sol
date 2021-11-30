@@ -164,7 +164,7 @@ contract TheLazyCornerContract {
     * @param price Price of the note
   */
   modifier sufficientFunds(uint price){
-    require(price <= msg.sender.balance, "Insufficient funds");
+    require(price <= msg.value, "Insufficient funds");
     _;
   }
 
