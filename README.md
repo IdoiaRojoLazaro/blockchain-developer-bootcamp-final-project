@@ -3,7 +3,7 @@ My blockchain developer bootcamp final project
 
 # The lazy corner
 ## About
-This DApp is a market place where seller can upload their notes, and buyer can buy it. Above all, it is designed for notes on oppositions exams, where having good notes makes a big difference, and there is a clear market niche. The idea is to provide a secure platform to interchange notes, and ensure that the studious owner of the great notes receive something in exchange. Nerd days are over.
+This DApp is a market place where sellers can upload their notes, and buyers can buy them. Above all, it is designed for oppositions exams notes, where having good notes makes a big difference, and there is a clear market niche. The idea is to provide a secure platform to interchange notes, and ensure that the studious owner of the great notes receive something in exchange. Nerd days are over.
 
 ### Public interface on Netlify: 
 [The Lazy Corner](https://thelazycorner.netlify.app/)
@@ -39,7 +39,7 @@ Available in the contracts folder:
 * Compile and deploy contracts and test `truffle test`
 
 ### Unit Test
-The unit test build for the smart contract cover the activate and deactivate of the circuit breaker, with all the functions related. The creation of user, changing of approval status, and creation of notes, the validation of the functions that are accessible just for some roles, the access of a list of notes and users, and the validation of the correct process of payment with the correct transfer of the 90% to the seller and 10% to de admin as commission. 
+The unit test build for the smart contract cover the activate and deactivate of the circuit breaker, with all the functions related. The creation of user, changing of seller approval status, and creation of notes, the validation of the functions that are accessible just for some roles, the access of a list of notes and users, and the validation of the correct process of payment with the correct transfer of the 90% to the seller and 10% to de admin as commission. 
 ### Run client locally
 Go to `client` folder and create a `.env` file. You will need to add this environment variables with its corresponding value:
 ```
@@ -63,10 +63,10 @@ To run the DApp locally:
 * Open web browser on http://localhost:3000/
 
 ### Flow
-1. `ganache-cli`
+1. `ganache-cli` (if you deploy the contract locally)
 2. Run client locally (see upside)
-3. Add first account provided by ganache to metamask (will be admin account), and **Sign up as Seller** with the admin account in the http://localhost:3000
-4. Repeat the process with another account, to create a seller
+3. Add first account provided by ganache to metamask (will be admin account), and click **I already have an account** on the login page on http://localhost:3000
+4. Repeat the process with another account, to create a seller **Sign up as Seller**
 5. Repeat the process with another account, to create a buyer **Sign up as Buyer**
 6. Return to the admin account(change account on metamask and refresh page), and approve the seller from the Admin home page 
 7. Return to the seller account, and **create a note**
@@ -83,5 +83,12 @@ To run the DApp locally:
 
 ## Screencast
 
-* Seller registers, admin approves seller: https://youtu.be/Ss4rM23EriI
-* Seller creates note. Buyer registers and buy note: https://youtu.be/8gsyq7Hr8mM
+* Complete flow throw the front project: https://youtu.be/blqh40BMvWw
+* Login with admin account.
+* Create Seller user.
+* Approve seller user by the admin.
+* Create two notes.
+* Create buyer user.
+* Buy one of the notes.
+* Check balances.
+* Check user list
