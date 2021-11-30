@@ -47914,8 +47914,8 @@
         }
       },
       "links": {},
-      "address": "0x4177175434EB9Fc003c5509587a9bb1d5AF8aDEB",
-      "transactionHash": "0x2295ecb06248cbc3126111f123ebb5fad682ebc4d9cf3cae5a9279e9abb355da"
+      "address": "0xB7131308199C8D8E93bE1AFA43c4A0Cb05b5E5Be",
+      "transactionHash": "0x20a466a332b1d1356c4757c58a1b731d1fd721fb40b06cced6298e1e0ee7dd5f"
     },
     "1638270750493": {
       "events": {},
@@ -47931,7 +47931,7 @@
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-11-30T14:16:52.811Z",
+  "updatedAt": "2021-11-30T14:37:04.171Z",
   "networkType": "ethereum",
   "devdoc": {
     "author": "Idoia Rojo Lázaro",
