@@ -42,8 +42,7 @@ export const NoteShowModal = ({ show, setShow, contract }) => {
   const handleSubmitForm = async (e) => {
     e.preventDefault();
     let balanceAct = await getBalance();
-
-    if (balanceAct < noteActive.price) {
+    if (parseInt(balanceAct) < parseInt(noteActive.price)) {
       swalError(
         'Add some credit to your wallet and refresh the page',
         'Insufficient funds to buy the note'
@@ -52,7 +51,7 @@ export const NoteShowModal = ({ show, setShow, contract }) => {
       setLoadingSubmit(true);
       let response = contract.methods.buyNote(noteActive.noteHash).send({
         from: account,
-        value: noteActive.price
+        value: parseInt(noteActive.price)
       });
 
       swalConnectionMetamask();
